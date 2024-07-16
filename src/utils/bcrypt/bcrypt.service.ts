@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt';
+import { IBcryptService } from './bcrypt.interface';
 
-export class BcryptService {
+export class BcryptService implements IBcryptService {
     public async hashPassword(password: string): Promise<string> {
         return new Promise(async (resolve, reject) => {
             try {
