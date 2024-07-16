@@ -2,13 +2,13 @@
   "name": "macronics-server",
   "version": "1.0.0",
   "description": "API for  Macronics services",
-  "main": "./dist/sever.js",
   "scripts": {
     "start": "node dist/src/server.js",
-    "start:dev": "nodemon .src/server.ts",
+    "start:dev": "concurrently \"npm run watch-ts\" \"nodemon dist/src/server.js\"",
     "prestart": "npm run build-ts",
     "build-ts": "npm run clean && tsc",
     "clean": "rimraf dist/",
+    "watch-ts": "tsc -w",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "lint": "eslint src/**/*.ts --fix",
     "test": "NODE_ENV=test jest --forceExit --coverage --verbose --colors --detectOpenHandles",
@@ -105,6 +105,7 @@
     "sequelize-cli-typescript": "^3.2.0-c",
     "ts-jest": "^29.2.2",
     "ts-lint": "^4.5.1",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "tslib": "^2.6.3"
   }
 }
