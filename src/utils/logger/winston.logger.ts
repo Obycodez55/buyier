@@ -1,4 +1,4 @@
-import { LoggerPath, LoggerPathIndex } from "../../constants/logger-path.enum";
+import { LoggerPath, LoggerPathIndex } from "../../constants/logger-paths.enum";
 import { configService } from "../config/config.service";
 import { ILogger } from "./logger.interface";
 import { LoggerOptions, Logger, transports, format, createLogger } from "winston";
