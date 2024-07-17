@@ -1,17 +1,12 @@
 import { Request, Response, Router } from "express";
 import HttpException from "../utils/exceptions/http.exception";
-import { ResponseDto } from "../dtos/response.dto";
-import { SuccessMessages } from "../constants/success-messages.enum";
-import HttpStatus from "http-status";
-import { ResponseStatus } from "../interfaces/response.interface";
+import { HomeController } from "../controllers/home.controller";
 
 
 const router = Router();
+const homeController = new HomeController();
 
-router.get("/", (req: Request, res: Response) => {
-    const resObj = new ResponseDto(ResponseStatus.SUCCESS ,SuccessMessages.WELCOME_HOME);
-    res.status(HttpStatus.OK).send(resObj);
-});
+router.get("/", homeController.index);
 
 // Handle All 404 Routes
 router.all("*", (req: Request, res: Response) => {

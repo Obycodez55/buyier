@@ -5,7 +5,7 @@ import helmet from 'helmet';
 
 import IndexRouter from './routes/index';
 import { databaseService } from './utils/database';
-import errorHandler from './utils/middlewares/error-handler';
+import errorHandler from './utils/middlewares/error-handler.middleware';
 
 
 // Create Express App
