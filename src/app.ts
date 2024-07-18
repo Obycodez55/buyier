@@ -13,6 +13,7 @@ const app: express.Express = express();
 
 // Connect to the Database
 databaseService.authenticate();
+databaseService.sync();
 
 app.set('port', process.env.PORT || 8080);
 app.use(express.json());

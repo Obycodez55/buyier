@@ -32,4 +32,15 @@ export class DatabaseService {
                 process.exit(0);
             });
     }
+
+    sync() {
+        this.sequelize.sync({ force: true })
+            .then(() => {
+                this.logger.info("All models were synchronized successfully.");
+            })
+            .catch(err => {
+                this.logger.error("An error occurred while synchronizing the models:", err);
+                process.exit(0);
+            });
+    }
 }

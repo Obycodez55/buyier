@@ -38,9 +38,13 @@ MerchantVerification.init({
         type: DataTypes.ENUM("PENDING", "APPROVED", "REJECTED"),
         defaultValue: "PENDING",
     },
+    dateOfApproval: {
+        type: DataTypes.DATE,
+    },
 }, {
     sequelize,
-    modelName: "MerchantVerification"
+    modelName: "MerchantVerification",
+    createdAt: "dateOfApplication"
 })
 
 // Define Relationships

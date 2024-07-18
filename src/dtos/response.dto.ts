@@ -1,4 +1,4 @@
-import { IResponse, ResponseStatus } from "../interfaces/response.interface";
+import { IResponse, ResponseStatus } from "./interfaces/response.interface";
 
 
 export class ResponseDto implements IResponse {

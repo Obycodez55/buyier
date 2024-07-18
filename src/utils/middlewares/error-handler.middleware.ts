@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import HttpException from "../exceptions/http.exception";
 import HttpStatus from "http-status";
 import { ResponseDto } from "../../dtos/response.dto";
-import { ResponseStatus } from "../../interfaces/response.interface";
+import { ResponseStatus } from "../../dtos/interfaces/response.interface";
 
 
 function errorHandler(error: HttpException, request: Request, response: Response, next: NextFunction) {

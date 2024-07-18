@@ -29,9 +29,14 @@ PhoneNumber.init({
             key: "id",
         }
     },
-    phoneNumber: {
+    number: {
         allowNull: false,
         type: DataTypes.STRING,
+    },
+    isPrimary: {
+        allowNull: false,
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
     }
 }, {
     sequelize,
