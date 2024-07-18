@@ -26,6 +26,14 @@ export class DatabaseService {
             .authenticate()
             .then(() => {
                 this.logger.info("Connection has been established successfully.");
+                this.sequelize.sync({ force: true })
+                    .then(() => {
+                        this.logger.info("All models were synchronized successfully.");
+                    })
+                    .catch(err => {
+                        this.logger.error("An error occurred while synchronizing the models:", err);
+                        process.exit(0);
+                    });
             })
             .catch(err => {
                 this.logger.error("Unable to connect to the database:", err);
@@ -33,14 +41,5 @@ export class DatabaseService {
             });
     }
 
-    sync() {
-        this.sequelize.sync({ force: true })
-            .then(() => {
-                this.logger.info("All models were synchronized successfully.");
-            })
-            .catch(err => {
-                this.logger.error("An error occurred while synchronizing the models:", err);
-                process.exit(0);
-            });
-    }
+
 }
