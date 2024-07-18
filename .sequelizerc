@@ -4,6 +4,6 @@ module.exports = {
   'config': path.resolve('dist/config', 'config.js'),
   'models-path': path.resolve('db', 'models'),
   'seeders-path': path.resolve('dist/db', 'seeders'),
-  'migrations-source-path': path.resolve('db', 'migrations'),
-    'migrations-compiled-path': path.resolve('dist/db', 'migrations')
+  'migrations-path': path.resolve('db', 'migrations'),
+    // 'migrations-compiled-path': path.resolve('dist/db', 'migrations')
 };

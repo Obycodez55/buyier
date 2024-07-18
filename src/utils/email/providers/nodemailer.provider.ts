@@ -1,31 +1,23 @@
-import { createTransport, Transporter } from "nodemailer";
-import { IEmailService } from "./email.interface";
 import { google } from "googleapis";
+import { IEmailService } from "../email.interface";
+import { createTransport, Transporter } from "nodemailer";
+import { configService } from "../../config/config.service";
+import { ILogger } from "../../logger/logger.interface";
+import { CompanyDetails } from "../../../constants/company-details";
+import { EmailPaths } from "../../../constants/email-paths.enum";
 import * as ejs from "ejs";
-import { configService } from "../config/config.service";
-import { CompanyDetails } from "../../constants/company-details";
-import { EmailPaths } from "../../constants/email-paths.enum";
-import { ILogger } from "../logger/logger.interface";
-import { WinstonLogger } from "../logger/winston.logger";
+
 
 class OAuth2Client extends google.auth.OAuth2 { }
 
-export class NodemailerEmailService implements IEmailService {
-    private readonly oAuth2Client: OAuth2Client;
+export class NodemailerProvider implements IEmailService {
+    private readonly OAuth2Client: OAuth2Client;
     private readonly transporter: Transporter;
     private logger: ILogger;
 
-    constructor() {
-        this.logger = new WinstonLogger("NodemailerEmailService");
-        this.oAuth2Client = new google.auth.OAuth2(
-            configService.get<string>("GMAIL_CLIENT_ID"),
-            configService.get<string>("GMAIL_CLIENT_SECRET"),
-            configService.get<string>("GMAIL_REDIRECT_URI")
-        );
-
-        this.oAuth2Client.setCredentials({
-            refresh_token: configService.get<string>("GMAIL_REFRESH_TOKEN")
-        });
+    constructor(logger: ILogger, OAuth2Client: OAuth2Client) {
+        this.logger = logger;
+        this.OAuth2Client = OAuth2Client;
         
         this.transporter = createTransport({
             service: 'gmail',
@@ -35,7 +27,7 @@ export class NodemailerEmailService implements IEmailService {
                 clientId: configService.get<string>("GMAIL_CLIENT_ID"),
                 clientSecret: configService.get<string>("GMAIL_CLIENT_SECRET"),
                 refreshToken: configService.get<string>("GMAIL_REFRESH_TOKEN"),
-                accessToken: this.oAuth2Client.getAccessToken() as any,
+                accessToken: this.OAuth2Client.getAccessToken() as any,
             },
         });
     }

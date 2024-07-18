@@ -18,17 +18,18 @@ export class DatabaseService {
                 host: configService.get<string>("DB_HOST"),
                 dialect
             }
-        )
+        );
     }
+
     authenticate() {
         this.sequelize
             .authenticate()
             .then(() => {
                 this.logger.info("Connection has been established successfully.");
-            }
-            )
+            })
             .catch(err => {
-                this.logger.error("Unable to connect to the database:", err); process.exit(0);
+                this.logger.error("Unable to connect to the database:", err);
+                process.exit(0);
             });
     }
 }
