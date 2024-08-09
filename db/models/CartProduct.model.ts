@@ -2,14 +2,13 @@ import { DataTypes, Model } from "sequelize";
 import { databaseService } from "../../src/utils/database";
 
 // Import Related Models
-import { Customer } from "./Customer";
-import { Delivery } from "./Delivery";
-import { TransactionProduct } from "./TransactionProduct";
+import { Customer } from "./Customer.model";
+import { Product } from "./Product.model";
 
 const sequelize = databaseService.sequelize;
-export class Transaction extends Model { }
+export class CartProduct extends Model { }
 
-Transaction.init({
+CartProduct.init({
     id: {
         allowNull: false,
         autoIncrement: true,
@@ -24,38 +23,31 @@ Transaction.init({
             key: "id",
         }
     },
-    deliveryId: {
+    productId: {
         allowNull: false,
         type: DataTypes.INTEGER,
         references: {
-            model: "Delivery",
+            model: "Product",
             key: "id",
         }
     },
-    deliveryFee: {
+    quantity: {
         allowNull: false,
-        type: DataTypes.FLOAT,
+        type: DataTypes.INTEGER,
     },
-    productsAmount: {
+    unitPrice: {
         allowNull: false,
         type: DataTypes.FLOAT,
     },
     totalAmount: {
         allowNull: false,
         type: DataTypes.FLOAT,
-    },
-    date: {
-        allowNull: false,
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-    },
+    }
 }, {
     sequelize,
-    modelName: "Transaction",
-    timestamps: false,
+    modelName: "CartProduct",
 })
 
 // Define Relationships
-Transaction.belongsTo(Customer, {foreignKey: "customerId", as: "customer"});
-Transaction.hasOne(Delivery, {foreignKey: "deliveryId", as: "delivery"});
-Transaction.hasMany(TransactionProduct, {foreignKey: "transactionId", as: "products"});
+CartProduct.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
+CartProduct.belongsTo(Product, { foreignKey: "productId", as: "product" });

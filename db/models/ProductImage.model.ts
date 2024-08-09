@@ -2,7 +2,7 @@ import { DataTypes, Model } from "sequelize";
 import { databaseService } from "../../src/utils/database";
 
 // Import Related Models
-import { Product } from "./Product";
+import { Product } from "./Product.model";
 
 const sequelize = databaseService.sequelize;
 export class ProductImage extends Model { }
@@ -17,7 +17,7 @@ ProductImage.init({
     productId: {
         allowNull: false,
         type: DataTypes.INTEGER,
-        references : {
+        references: {
             model: "Product",
             key: "id",
         }
@@ -32,4 +32,4 @@ ProductImage.init({
 })
 
 // Define Relationships
-ProductImage.belongsTo(Product, {foreignKey: "productId", as: "product"});
+ProductImage.belongsTo(Product, { foreignKey: "productId", as: "product" });

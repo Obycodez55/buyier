@@ -5,5 +5,5 @@ module.exports = {
   'models-path': path.resolve('db', 'models'),
   'seeders-path': path.resolve('dist/db', 'seeders'),
   'migrations-path': path.resolve('dist/db', 'migrations'),
-    // 'migrations-compiled-path': path.resolve('dist/db', 'migrations')
+    'migrations-compiled-path': path.resolve('dist/db', 'migrations')
 };

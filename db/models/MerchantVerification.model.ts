@@ -2,7 +2,7 @@ import { DataTypes, Model } from "sequelize";
 import { databaseService } from "../../src/utils/database";
 
 // Import Related Models
-import { Merchant } from "./Merchant";
+import { Merchant } from "./Merchant.model";
 
 const sequelize = databaseService.sequelize;
 export class MerchantVerification extends Model { }
@@ -48,4 +48,4 @@ MerchantVerification.init({
 })
 
 // Define Relationships
-MerchantVerification.belongsTo(Merchant, {foreignKey: "merchantId", as: "merchant"});
+MerchantVerification.belongsTo(Merchant, { foreignKey: "merchantId", as: "merchant" });

@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+import { Sequelize } from "sequelize-typescript";
 import { ILogger } from "../logger/logger.interface";
 import { DbDialectType } from './db-dialect.type';
 import { WinstonLogger } from "../logger/winston.logger";
@@ -10,15 +10,23 @@ export class DatabaseService {
 
     constructor(dialect: DbDialectType) {
         this.logger = new WinstonLogger("DatabaseService");
-        this.sequelize = new Sequelize(
-            configService.get<string>("DB_NAME")!,
-            configService.get<string>("DB_USER")!,
-            configService.get<string>("DB_PASSWORD"),
-            {
-                host: configService.get<string>("DB_HOST"),
-                dialect
-            }
-        );
+        // this.sequelize = new Sequelize(
+        //     configService.get<string>("DB_NAME")!,
+        //     configService.get<string>("DB_USER")!,
+        //     configService.get<string>("DB_PASSWORD"),
+        //     {
+        //         host: configService.get<string>("DB_HOST"),
+        //         dialect
+        //     }
+        // );
+        this.sequelize = new Sequelize({
+            database: configService.get<string>("DB_NAME")!,
+            username: configService.get<string>("DB_USER")!,
+            password: configService.get<string>("DB_PASSWORD"),
+            host: configService.get<string>("DB_HOST"),
+            dialect,
+            models: [__dirname + '/../../**/*.model.ts'],
+        })
     }
 
     authenticate() {
@@ -26,14 +34,14 @@ export class DatabaseService {
             .authenticate()
             .then(() => {
                 this.logger.info("Connection has been established successfully.");
-                this.sequelize.sync({ force: true })
-                    .then(() => {
-                        this.logger.info("All models were synchronized successfully.");
-                    })
-                    .catch(err => {
-                        this.logger.error("An error occurred while synchronizing the models:", err);
-                        process.exit(0);
-                    });
+                // this.sequelize.sync({ force: true })
+                //     .then(() => {
+                //         this.logger.info("All models were synchronized successfully.");
+                //     })
+                //     .catch(err => {
+                //         this.logger.error("An error occurred while synchronizing the models:", err);
+                //         process.exit(0);
+                //     });
             })
             .catch(err => {
                 this.logger.error("Unable to connect to the database:", err);

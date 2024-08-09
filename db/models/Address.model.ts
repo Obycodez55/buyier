@@ -2,13 +2,14 @@ import { DataTypes, Model } from "sequelize";
 import { databaseService } from "../../src/utils/database";
 
 // Import Related Models
-import { Customer } from "./Customer";
-import { Merchant } from "./Merchant";
+import { Customer } from "./Customer.model";
+import { Merchant } from "./Merchant.model";
 
 const sequelize = databaseService.sequelize;
-export class Code extends Model { }
+export class Address extends Model { }
 
-Code.init({
+// Initialize the Address model and define its attributes
+Address.init({
     id: {
         allowNull: false,
         autoIncrement: true,
@@ -29,25 +30,34 @@ Code.init({
             key: "id",
         }
     },
-    type: {
+    address: {
         allowNull: false,
-        type: DataTypes.ENUM('EMAIL', 'PASSWORD_RESET')
+        type: DataTypes.STRING,
     },
-    code: {
+    city: {
         allowNull: false,
-        type: DataTypes.INTEGER,
-        validate: {
-            len: [4, 6]
-        },
+        type: DataTypes.STRING,
     },
-    expires: {
+    state: {
         allowNull: false,
-        type: DataTypes.DATE,
-        defaultValue: () => new Date(new Date().getTime() + 15 * 60 * 1000)
+        type: DataTypes.STRING,
+    },
+    country: {
+        allowNull: false,
+        type: DataTypes.STRING,
+    },
+    postalCode: {
+        allowNull: false,
+        type: DataTypes.STRING,
+    },
+    isDeleted: {
+        allowNull: false,
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
     }
 }, {
     sequelize,
-    modelName: "Code",
+    modelName: "Address",
     validate: {
         eitherCustomerIdOrMerchantId() {
             if ((this.customerId && this.merchantId) || (!this.customerId && !this.merchantId)) {
@@ -57,6 +67,6 @@ Code.init({
     }
 })
 
-// Define Relationships
-Code.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
-Code.belongsTo(Merchant, { foreignKey: "merchantId", as: "merchant" });
+// Define the relationships with other models
+Address.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
+Address.belongsTo(Merchant, { foreignKey: "merchantId", as : "merchant" });

@@ -2,40 +2,41 @@ import { DataTypes, Model } from "sequelize";
 import { databaseService } from "../../src/utils/database";
 
 // Import Related Models
-import { Product } from "./Product";
-import { Transaction } from "./Transaction";
+import { Customer } from "./Customer.model";
+import { Delivery } from "./Delivery.model";
+import { TransactionProduct } from "./TransactionProduct.model";
 
 const sequelize = databaseService.sequelize;
-export class TransactionProduct extends Model { }
+export class Transaction extends Model { }
 
-TransactionProduct.init({
+Transaction.init({
     id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: DataTypes.INTEGER,
     },
-    transactionId: {
+    customerId: {
         allowNull: false,
         type: DataTypes.INTEGER,
         references: {
-            model: "Transaction",
+            model: "Customer",
             key: "id",
         }
     },
-    productId: {
+    deliveryId: {
         allowNull: false,
         type: DataTypes.INTEGER,
         references: {
-            model: "Product",
+            model: "Delivery",
             key: "id",
         }
     },
-    quantity: {
+    deliveryFee: {
         allowNull: false,
-        type: DataTypes.INTEGER,
+        type: DataTypes.FLOAT,
     },
-    unitPrice: {
+    productsAmount: {
         allowNull: false,
         type: DataTypes.FLOAT,
     },
@@ -47,13 +48,14 @@ TransactionProduct.init({
         allowNull: false,
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
-    }
+    },
 }, {
     sequelize,
-    modelName: "TransactionProduct",
+    modelName: "Transaction",
     timestamps: false,
 })
 
 // Define Relationships
-TransactionProduct.belongsTo(Product, {foreignKey: "productId", as: "product"});
-TransactionProduct.belongsTo(Transaction, {foreignKey: "transactionId", as: "transaction"});
+Transaction.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
+Transaction.hasOne(Delivery, { foreignKey: "deliveryId", as: "delivery" });
+Transaction.hasMany(TransactionProduct, { foreignKey: "transactionId", as: "products" });

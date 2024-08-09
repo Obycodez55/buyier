@@ -2,10 +2,10 @@ import { DataTypes, Model } from "sequelize";
 import { databaseService } from "../../src/utils/database";
 
 // Import Related Models
-import { Merchant } from "./Merchant";
-import { ProductImage } from "./ProductImage";
-import { TransactionProduct } from "./TransactionProduct";
-import { CartProduct } from "./CartProduct";
+import { Merchant } from "./Merchant.model";
+import { ProductImage } from "./ProductImage.model";
+import { TransactionProduct } from "./TransactionProduct.model";
+import { CartProduct } from "./CartProduct.model";
 
 
 const sequelize = databaseService.sequelize;
@@ -37,7 +37,7 @@ Product.init({
         allowNull: false,
         type: DataTypes.STRING,
     },
-    type:{
+    type: {
         allowNull: false,
         type: DataTypes.ENUM("USED", "NEW"),
     },
@@ -63,7 +63,7 @@ Product.init({
 })
 
 // Define Relationships
-Product.belongsTo(Merchant, {foreignKey: "merchantId", as: "merchant"});
-Product.hasMany(ProductImage, {foreignKey: "productId", as: "images"});
-Product.hasMany(TransactionProduct, {foreignKey: "productId", as: "transactions"});
-Product.hasMany(CartProduct, {foreignKey: "productId", as: "carts"});
+Product.belongsTo(Merchant, { foreignKey: "merchantId", as: "merchant" });
+Product.hasMany(ProductImage, { foreignKey: "productId", as: "images" });
+Product.hasMany(TransactionProduct, { foreignKey: "productId", as: "transactions" });
+Product.hasMany(CartProduct, { foreignKey: "productId", as: "carts" });

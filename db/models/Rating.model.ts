@@ -2,8 +2,8 @@ import { DataTypes, Model } from "sequelize";
 import { databaseService } from "../../src/utils/database";
 
 // Import Related Models
-import { Product } from "./Product";
-import { Customer } from "./Customer";
+import { Product } from "./Product.model";
+import { Customer } from "./Customer.model";
 
 const sequelize = databaseService.sequelize;
 export class Rating extends Model { }
@@ -48,5 +48,5 @@ Rating.init({
 })
 
 // Define Relationships
-Rating.belongsTo(Product, {foreignKey: "productId", as: "product"});
-Rating.belongsTo(Customer, {foreignKey: "customerId", as: "customer"});
+Rating.belongsTo(Product, { foreignKey: "productId", as: "product" });
+Rating.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });

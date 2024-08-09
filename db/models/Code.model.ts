@@ -2,13 +2,13 @@ import { DataTypes, Model } from "sequelize";
 import { databaseService } from "../../src/utils/database";
 
 // Import Related Models
-import { Customer } from "./Customer";
-import { Merchant } from "./Merchant";
+import { Customer } from "./Customer.model";
+import { Merchant } from "./Merchant.model";
 
 const sequelize = databaseService.sequelize;
-export class PhoneNumber extends Model { }
+export class Code extends Model { }
 
-PhoneNumber.init({
+Code.init({
     id: {
         allowNull: false,
         autoIncrement: true,
@@ -29,18 +29,25 @@ PhoneNumber.init({
             key: "id",
         }
     },
-    number: {
+    type: {
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataTypes.ENUM('EMAIL', 'PASSWORD_RESET')
     },
-    isPrimary: {
+    code: {
         allowNull: false,
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
+        type: DataTypes.INTEGER,
+        validate: {
+            len: [4, 6]
+        },
+    },
+    expires: {
+        allowNull: false,
+        type: DataTypes.DATE,
+        defaultValue: () => new Date(new Date().getTime() + 15 * 60 * 1000)
     }
 }, {
     sequelize,
-    modelName: "PhoneNumber",
+    modelName: "Code",
     validate: {
         eitherCustomerIdOrMerchantId() {
             if ((this.customerId && this.merchantId) || (!this.customerId && !this.merchantId)) {
@@ -51,5 +58,5 @@ PhoneNumber.init({
 })
 
 // Define Relationships
-PhoneNumber.belongsTo(Customer, {foreignKey: "customerId", as: "customer"});
-PhoneNumber.belongsTo(Merchant, {foreignKey: "merchantId", as: "merchant"});
+Code.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
+Code.belongsTo(Merchant, { foreignKey: "merchantId", as: "merchant" });

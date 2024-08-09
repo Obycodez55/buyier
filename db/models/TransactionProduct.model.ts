@@ -2,24 +2,24 @@ import { DataTypes, Model } from "sequelize";
 import { databaseService } from "../../src/utils/database";
 
 // Import Related Models
-import { Customer } from "./Customer";
-import { Product } from "./Product";
+import { Product } from "./Product.model";
+import { Transaction } from "./Transaction.model";
 
 const sequelize = databaseService.sequelize;
-export class CartProduct extends Model { }
+export class TransactionProduct extends Model { }
 
-CartProduct.init({
+TransactionProduct.init({
     id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: DataTypes.INTEGER,
     },
-    customerId: {
+    transactionId: {
         allowNull: false,
         type: DataTypes.INTEGER,
         references: {
-            model: "Customer",
+            model: "Transaction",
             key: "id",
         }
     },
@@ -42,12 +42,18 @@ CartProduct.init({
     totalAmount: {
         allowNull: false,
         type: DataTypes.FLOAT,
+    },
+    date: {
+        allowNull: false,
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW,
     }
 }, {
     sequelize,
-    modelName: "CartProduct",
+    modelName: "TransactionProduct",
+    timestamps: false,
 })
 
 // Define Relationships
-CartProduct.belongsTo(Customer, {foreignKey: "customerId", as: "customer"});
-CartProduct.belongsTo(Product, {foreignKey: "productId", as: "product"});
+TransactionProduct.belongsTo(Product, { foreignKey: "productId", as: "product" });
+TransactionProduct.belongsTo(Transaction, { foreignKey: "transactionId", as: "transaction" });

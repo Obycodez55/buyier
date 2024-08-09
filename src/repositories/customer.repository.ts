@@ -1,4 +1,4 @@
-import { Customer } from "../../db/models/Customer";
+import { Customer } from "../../db/models/Customer.model";
 import { ICustomer } from "../interfaces/customer.interface";
 import { ICustomerRepository } from "./interfaces/customer.repository.interface";
 
@@ -57,7 +57,7 @@ export class CustomerRepository implements ICustomerRepository {
     update(updateData: ICustomer, id: number): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
-                await Customer.update({...updateData}, {
+                await Customer.update({ ...updateData }, {
                     where: {
                         id,
                         isDeleted: false

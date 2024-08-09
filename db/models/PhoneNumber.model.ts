@@ -2,14 +2,13 @@ import { DataTypes, Model } from "sequelize";
 import { databaseService } from "../../src/utils/database";
 
 // Import Related Models
-import { Customer } from "./Customer";
-import { Merchant } from "./Merchant";
+import { Customer } from "./Customer.model";
+import { Merchant } from "./Merchant.model";
 
 const sequelize = databaseService.sequelize;
-export class Address extends Model { }
+export class PhoneNumber extends Model { }
 
-// Initialize the Address model and define its attributes
-Address.init({
+PhoneNumber.init({
     id: {
         allowNull: false,
         autoIncrement: true,
@@ -30,34 +29,18 @@ Address.init({
             key: "id",
         }
     },
-    address: {
+    number: {
         allowNull: false,
         type: DataTypes.STRING,
     },
-    city: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    state: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    country: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    postalCode: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    isDeleted: {
+    isPrimary: {
         allowNull: false,
         type: DataTypes.BOOLEAN,
         defaultValue: false,
     }
 }, {
     sequelize,
-    modelName: "Address",
+    modelName: "PhoneNumber",
     validate: {
         eitherCustomerIdOrMerchantId() {
             if ((this.customerId && this.merchantId) || (!this.customerId && !this.merchantId)) {
@@ -67,6 +50,6 @@ Address.init({
     }
 })
 
-// Define the relationships with other models
-Address.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
-Address.belongsTo(Merchant, { foreignKey: "merchantId", as : "merchant" });
+// Define Relationships
+PhoneNumber.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
+PhoneNumber.belongsTo(Merchant, { foreignKey: "merchantId", as: "merchant" });
