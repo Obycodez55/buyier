@@ -1,4 +1,4 @@
-import { Table, Column, Model, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { Table, Column, Model, ForeignKey, BelongsTo, DataType } from "sequelize-typescript";
 import { Customer } from "./Customer.model";
 import { Product } from "./Product.model";
 
@@ -8,38 +8,44 @@ import { Product } from "./Product.model";
     timestamps: true,
     version: true,
 })
-export class CartProduct extends Model<CartProduct> {
+export class CartProduct extends Model {
     @Column({
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
+        defaultValue: DataType.UUIDV4,
+        type: DataType.UUID,
     })
     declare id: number;
 
     @ForeignKey(() => Customer)
     @Column({
+        type: DataType.UUID,
         allowNull: false,
     })
     declare customerId: number;
 
     @ForeignKey(() => Product)
     @Column({
+        type: DataType.UUID,
         allowNull: false,
     })
     declare productId: number;
 
     @Column({
         allowNull: false,
+        type: DataType.INTEGER,
     })
     declare quantity: number;
 
     @Column({
         allowNull: false,
+        type: DataType.FLOAT,
     })
     declare unitPrice: number;
 
     @Column({
         allowNull: false,
+        type: DataType.FLOAT,
     })
     declare totalAmount: number;
 

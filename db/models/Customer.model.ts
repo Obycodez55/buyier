@@ -13,13 +13,14 @@ import { Rating } from "./Rating.model";
     modelName: "Customer",
     paranoid: true,
     timestamps: true,
+    version: true,
  })
-export class Customer extends Model<Customer> {
+export class Customer extends Model {
     @Column({
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: DataType.INTEGER,
+        defaultValue: DataType.UUIDV4,
+        type: DataType.UUID,
     })
     declare id: number;
 

@@ -1,27 +1,31 @@
-import { Table, Column, Model, ForeignKey, BelongsTo } from "sequelize-typescript";
-import { DataTypes } from "sequelize";
+import { Table, Column, Model, ForeignKey, BelongsTo, DataType } from "sequelize-typescript";
 import { Product } from "./Product.model";
 
-@Table({ modelName: "ProductImage" })
-export class ProductImage extends Model<ProductImage> {
+@Table({
+    modelName: "ProductImage",
+    timestamps: true,
+    paranoid: true,
+    version: true,
+})
+export class ProductImage extends Model {
     @Column({
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER,
+        defaultValue: DataType.UUIDV4,
+        type: DataType.UUID,
     })
     declare id: number;
 
     @ForeignKey(() => Product)
     @Column({
         allowNull: false,
-        type: DataTypes.INTEGER,
+        type: DataType.UUID,
     })
     declare productId: number;
 
     @Column({
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataType.STRING,
     })
     declare image: string;
 

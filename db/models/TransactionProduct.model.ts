@@ -4,27 +4,32 @@ import { Transaction } from "./Transaction.model";
 
 // Import Related Models
 
-@Table({ modelName: "TransactionProduct", timestamps: false })
-export class TransactionProduct extends Model<TransactionProduct> {
+@Table({
+    modelName: "TransactionProduct", 
+    timestamps: false,
+    paranoid: true,
+    version: true,
+})
+export class TransactionProduct extends Model {
     @Column({
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: DataType.INTEGER,
+        defaultValue: DataType.UUIDV4,
+        type: DataType.UUID,
     })
     declare id: number;
 
     @ForeignKey(() => Transaction)
     @Column({
         allowNull: false,
-        type: DataType.INTEGER,
+        type: DataType.UUID,
     })
     declare transactionId: number;
 
     @ForeignKey(() => Product)
     @Column({
         allowNull: false,
-        type: DataType.INTEGER,
+        type: DataType.UUID,
     })
     declare productId: number;
 

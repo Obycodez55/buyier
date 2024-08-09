@@ -5,6 +5,9 @@ import { Merchant } from "./Merchant.model";
 
 @Table({ 
     modelName: "PhoneNumber",
+    timestamps: true,
+    paranoid: true,
+    version: true,
     validate: {
         eitherCustomerIdOrMerchantId(this: PhoneNumber) {
             if ((this.customerId && this.merchantId) || (!this.customerId && !this.merchantId)) {
@@ -13,24 +16,24 @@ import { Merchant } from "./Merchant.model";
         }
     }
 })
-export class PhoneNumber extends Model<PhoneNumber> {
+export class PhoneNumber extends Model {
     @Column({
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: DataType.INTEGER,
+        defaultValue: DataType.UUIDV4,
+        type: DataType.UUID,
     })
     declare id: number;
 
     @ForeignKey(() => Customer)
     @Column({
-        type: DataType.INTEGER,
+        type: DataType.UUID,
     })
     declare customerId: number;
 
     @ForeignKey(() => Merchant)
     @Column({
-        type: DataType.INTEGER,
+        type: DataType.UUID,
     })
     declare merchantId: number;
 

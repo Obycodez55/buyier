@@ -4,27 +4,31 @@ import { Customer } from "./Customer.model";
 
 // Import Related Models
 
-@Table({ modelName: "Delivery", timestamps: false })
-export class Delivery extends Model<Delivery> {
+@Table({
+    modelName: "Delivery",
+    timestamps: false,
+    version: true,
+})
+export class Delivery extends Model {
     @Column({
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: DataType.INTEGER,
+        defaultValue: DataType.UUIDV4,
+        type: DataType.UUID,
     })
     declare id: number;
 
     @ForeignKey(() => Customer)
     @Column({
         allowNull: false,
-        type: DataType.INTEGER,
+        type: DataType.UUID,
     })
     declare customerId: number;
 
     @ForeignKey(() => Transaction)
     @Column({
         allowNull: false,
-        type: DataType.INTEGER,
+        type: DataType.UUID,
     })
     declare transactionId: number;
 

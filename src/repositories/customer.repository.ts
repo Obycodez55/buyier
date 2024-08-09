@@ -70,7 +70,7 @@ export class CustomerRepository implements ICustomerRepository {
         });
     }
 
-    save(customer: ICustomer): Promise<ICustomer> {
+    save(customer: Partial<ICustomer>): Promise<ICustomer> {
         return new Promise(async (resolve, reject) => {
             try {
                 const newCustomer = Customer.build(customer);

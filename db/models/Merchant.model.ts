@@ -8,13 +8,18 @@ import { Product } from "./Product.model";
 // Import Related Models
 
 
-@Table({ modelName: "Merchant" })
-export class Merchant extends Model<Merchant> {
+@Table({
+    modelName: "Merchant",
+    paranoid: true,
+    timestamps: true,
+    version: true,
+})
+export class Merchant extends Model {
     @Column({
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: DataType.INTEGER,
+        defaultValue: DataType.UUIDV4,
+        type: DataType.UUID,
     })
     declare id: number;
 

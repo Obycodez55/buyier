@@ -2,27 +2,31 @@ import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from "sequelize
 import { Product } from "./Product.model";
 import { Customer } from "./Customer.model";
 
-@Table({ modelName: "Rating" })
-export class Rating extends Model<Rating> {
+@Table({ modelName: "Rating",
+timestamps: true,
+paranoid: true,
+version: true,
+ })
+export class Rating extends Model {
     @Column({
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: DataType.INTEGER,
+        defaultValue: DataType.UUIDV4,
+        type: DataType.UUID,
     })
     declare id: number;
 
     @ForeignKey(() => Product)
     @Column({
         allowNull: false,
-        type: DataType.INTEGER,
+        type: DataType.UUID,
     })
     declare productId: number;
 
     @ForeignKey(() => Customer)
     @Column({
         allowNull: false,
-        type: DataType.INTEGER,
+        type: DataType.UUID,
     })
     declare customerId: number;
 

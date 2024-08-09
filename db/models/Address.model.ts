@@ -1,9 +1,8 @@
-import { Table, Model, Column, ForeignKey, BelongsTo } from "sequelize-typescript";
+import { Table, Model, Column, ForeignKey, BelongsTo, DataType } from "sequelize-typescript";
 
 // Import Related Models
 import { Customer } from "./Customer.model";
 import { Merchant } from "./Merchant.model";
-import { DataTypes } from "sequelize";
 
 
 @Table({
@@ -28,51 +27,51 @@ import { DataTypes } from "sequelize";
 export class Address extends Model {
     @Column({
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER,
+        defaultValue: DataType.UUIDV4,
+        type: DataType.UUID,
     })
     declare id: number;
 
     @ForeignKey(() => Customer)
     @Column({
-        type: DataTypes.INTEGER,
+        type: DataType.UUID,
     })
     declare customerId: number;
 
     @ForeignKey(() => Merchant)
     @Column({
-        type: DataTypes.INTEGER,
+        type: DataType.UUID,
     })
     declare merchantId: number;
 
     @Column({
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataType.STRING,
     })
     declare address: string;
 
     @Column({
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataType.STRING,
     })
     declare city: string;
 
     @Column({
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataType.STRING,
     })
     declare state: string;
 
     @Column({
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataType.STRING,
     })
     declare country: string;
 
     @Column({
         allowNull: false,
-        type: DataTypes.STRING,
+        type: DataType.STRING,
     })
     declare postalCode: string;
 

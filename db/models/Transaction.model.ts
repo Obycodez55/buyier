@@ -3,20 +3,24 @@ import { Customer } from "./Customer.model";
 import { Delivery } from "./Delivery.model";
 import { TransactionProduct } from "./TransactionProduct.model";
 
-@Table({ modelName: "Transaction", timestamps: false })
-export class Transaction extends Model<Transaction> {
+@Table({ modelName: "Transaction", 
+    timestamps: false,
+    paranoid: true,
+    version: true,
+})
+export class Transaction extends Model{
     @Column({
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: DataType.INTEGER,
+        defaultValue: DataType.UUIDV4,
+        type: DataType.UUID,
     })
     declare id: number;
 
     @ForeignKey(() => Customer)
     @Column({
         allowNull: false,
-        type: DataType.INTEGER,
+        type: DataType.UUID,
     })
     declare customerId: number;
 
@@ -26,7 +30,7 @@ export class Transaction extends Model<Transaction> {
     @ForeignKey(() => Delivery)
     @Column({
         allowNull: false,
-        type: DataType.INTEGER,
+        type: DataType.UUID,
     })
     declare deliveryId: number;
 
