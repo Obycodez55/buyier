@@ -1,7 +1,7 @@
 {
-  "name": "macronics-server",
+  "name": "buyier",
   "version": "1.0.0",
-  "description": "API for  Macronics services",
+  "description": "An eccomerce platform API",
   "scripts": {
     "start": "node dist/src/server.js",
     "start:dev": "concurrently \"npm run watch-ts\" \"nodemon dist/src/server.js\"",
@@ -43,14 +43,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MacRonics/Macronics-Server.git"
+    "url": "git+https://github.com/Obycodez55/buyier.git"
   },
-  "author": "Backend Team",
+  "author": "Obycodez55",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/MacRonics/Macronics-Server/issues"
+    "url": "https://github.com/Obycodez55/buyier/issues"
   },
-  "homepage": "https://github.com/MacRonics/Macronics-Server#readme",
+  "homepage": "https://github.com/Obycodez55/buyier.git#readme",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
