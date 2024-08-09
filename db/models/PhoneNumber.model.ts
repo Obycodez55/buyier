@@ -1,55 +1,57 @@
-import { DataTypes, Model } from "sequelize";
-import { databaseService } from "../../src/utils/database";
-
-// Import Related Models
+import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Customer } from "./Customer.model";
 import { Merchant } from "./Merchant.model";
 
-const sequelize = databaseService.sequelize;
-export class PhoneNumber extends Model { }
 
-PhoneNumber.init({
-    id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.INTEGER,
-    },
-    customerId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Customer",
-            key: "id",
-        }
-    },
-    merchantId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Merchant",
-            key: "id",
-        }
-    },
-    number: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    isPrimary: {
-        allowNull: false,
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    }
-}, {
-    sequelize,
+@Table({ 
     modelName: "PhoneNumber",
     validate: {
-        eitherCustomerIdOrMerchantId() {
+        eitherCustomerIdOrMerchantId(this: PhoneNumber) {
             if ((this.customerId && this.merchantId) || (!this.customerId && !this.merchantId)) {
                 throw new Error('Either customerId or merchantId must be provided, but not both.');
             }
         }
     }
 })
+export class PhoneNumber extends Model<PhoneNumber> {
+    @Column({
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataType.INTEGER,
+    })
+    declare id: number;
 
-// Define Relationships
-PhoneNumber.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
-PhoneNumber.belongsTo(Merchant, { foreignKey: "merchantId", as: "merchant" });
+    @ForeignKey(() => Customer)
+    @Column({
+        type: DataType.INTEGER,
+    })
+    declare customerId: number;
+
+    @ForeignKey(() => Merchant)
+    @Column({
+        type: DataType.INTEGER,
+    })
+    declare merchantId: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.STRING,
+    })
+    declare number: string;
+
+    @Column({
+        allowNull: false,
+        type: DataType.BOOLEAN,
+        defaultValue: false,
+    })
+    declare isPrimary: boolean;
+
+    @BelongsTo(() => Customer, { foreignKey: "customerId", as: "customer" })
+    declare customer: Customer;
+
+    @BelongsTo(() => Merchant, { foreignKey: "merchantId", as: "merchant" })
+    declare merchant: Merchant;
+}
+
+export default PhoneNumber;

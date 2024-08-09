@@ -1,72 +1,84 @@
-import { DataTypes, Model } from "sequelize";
-import { databaseService } from "../../src/utils/database";
+import { Table, Model, Column, ForeignKey, BelongsTo } from "sequelize-typescript";
 
 // Import Related Models
 import { Customer } from "./Customer.model";
 import { Merchant } from "./Merchant.model";
+import { DataTypes } from "sequelize";
 
-const sequelize = databaseService.sequelize;
-export class Address extends Model { }
 
-// Initialize the Address model and define its attributes
-Address.init({
-    id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.INTEGER,
-    },
-    customerId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Customer",
-            key: "id",
-        }
-    },
-    merchantId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Merchant",
-            key: "id",
-        }
-    },
-    address: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    city: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    state: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    country: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    postalCode: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    isDeleted: {
-        allowNull: false,
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    }
-}, {
-    sequelize,
+@Table({
     modelName: "Address",
     validate: {
-        eitherCustomerIdOrMerchantId() {
+        eitherCustomerIdOrMerchantId(this: Address) {
             if ((this.customerId && this.merchantId) || (!this.customerId && !this.merchantId)) {
                 throw new Error('Either customerId or merchantId must be provided, but not both.');
             }
         }
-    }
+    },
+    indexes: [
+        {
+            unique: false,
+            fields: ["customerId", "merchantId"]
+        }
+    ],
+    paranoid: true,
+    timestamps: true,
+    version: true,
 })
+export class Address extends Model {
+    @Column({
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER,
+    })
+    declare id: number;
 
-// Define the relationships with other models
-Address.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
-Address.belongsTo(Merchant, { foreignKey: "merchantId", as : "merchant" });
+    @ForeignKey(() => Customer)
+    @Column({
+        type: DataTypes.INTEGER,
+    })
+    declare customerId: number;
+
+    @ForeignKey(() => Merchant)
+    @Column({
+        type: DataTypes.INTEGER,
+    })
+    declare merchantId: number;
+
+    @Column({
+        allowNull: false,
+        type: DataTypes.STRING,
+    })
+    declare address: string;
+
+    @Column({
+        allowNull: false,
+        type: DataTypes.STRING,
+    })
+    declare city: string;
+
+    @Column({
+        allowNull: false,
+        type: DataTypes.STRING,
+    })
+    declare state: string;
+
+    @Column({
+        allowNull: false,
+        type: DataTypes.STRING,
+    })
+    declare country: string;
+
+    @Column({
+        allowNull: false,
+        type: DataTypes.STRING,
+    })
+    declare postalCode: string;
+
+    @BelongsTo(() => Customer)
+    declare customer: Customer;
+
+    @BelongsTo(() => Merchant)
+    declare merchant: Merchant;
+ }

@@ -1,59 +1,63 @@
-import { DataTypes, Model } from "sequelize";
-import { databaseService } from "../../src/utils/database";
-
-// Import Related Models
+import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Product } from "./Product.model";
 import { Transaction } from "./Transaction.model";
 
-const sequelize = databaseService.sequelize;
-export class TransactionProduct extends Model { }
+// Import Related Models
 
-TransactionProduct.init({
-    id: {
+@Table({ modelName: "TransactionProduct", timestamps: false })
+export class TransactionProduct extends Model<TransactionProduct> {
+    @Column({
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER,
-    },
-    transactionId: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Transaction",
-            key: "id",
-        }
-    },
-    productId: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Product",
-            key: "id",
-        }
-    },
-    quantity: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-    },
-    unitPrice: {
-        allowNull: false,
-        type: DataTypes.FLOAT,
-    },
-    totalAmount: {
-        allowNull: false,
-        type: DataTypes.FLOAT,
-    },
-    date: {
-        allowNull: false,
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-    }
-}, {
-    sequelize,
-    modelName: "TransactionProduct",
-    timestamps: false,
-})
+        type: DataType.INTEGER,
+    })
+    declare id: number;
 
-// Define Relationships
-TransactionProduct.belongsTo(Product, { foreignKey: "productId", as: "product" });
-TransactionProduct.belongsTo(Transaction, { foreignKey: "transactionId", as: "transaction" });
+    @ForeignKey(() => Transaction)
+    @Column({
+        allowNull: false,
+        type: DataType.INTEGER,
+    })
+    declare transactionId: number;
+
+    @ForeignKey(() => Product)
+    @Column({
+        allowNull: false,
+        type: DataType.INTEGER,
+    })
+    declare productId: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.INTEGER,
+    })
+    declare quantity: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.FLOAT,
+    })
+    declare unitPrice: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.FLOAT,
+    })
+    declare totalAmount: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.DATE,
+        defaultValue: DataType.NOW,
+    })
+    declare date: Date;
+
+    @BelongsTo(() => Product, { foreignKey: "productId", as: "product" })
+    declare product: Product;
+
+    @BelongsTo(() => Transaction, { foreignKey: "transactionId", as: "transaction" })
+    declare transaction: Transaction;
+}
+
+export default TransactionProduct;

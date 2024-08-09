@@ -1,69 +1,91 @@
-import { DataTypes, Model } from "sequelize";
-import { databaseService } from "../../src/utils/database";
-
-// Import Related Models
+import { Model, Table, Column, DataType, HasMany } from "sequelize-typescript";
 import { Code } from "./Code.model";
 import { Address } from "./Address.model";
 import { MerchantVerification } from "./MerchantVerification.model";
 import { PhoneNumber } from "./PhoneNumber.model";
 import { Product } from "./Product.model";
 
-const sequelize = databaseService.sequelize;
-export class Merchant extends Model { }
+// Import Related Models
 
-Merchant.init({
-    id: {
+
+@Table({ modelName: "Merchant" })
+export class Merchant extends Model<Merchant> {
+    @Column({
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER,
-    },
-    email: {
+        type: DataType.INTEGER,
+    })
+    declare id: number;
+
+    @Column({
         allowNull: false,
         unique: true,
-        type: DataTypes.STRING,
-    },
-    firstName: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    lastName: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    brandName: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    password: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    dateOfBirth: {
-        type: DataTypes.DATE,
-    },
-    type: {
-        allowNull: false,
-        type: DataTypes.ENUM("INDIVIDUAL", "COMPANY"),
-    },
-    emailVerified: {
-        allowNull: false,
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-    },
-    isDeleted: {
-        allowNull: false,
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    }
-}, {
-    sequelize,
-    modelName: "Merchant"
-})
+        type: DataType.STRING,
+    })
+    declare email: string;
 
-// Define Relationships
-Merchant.hasMany(Code, { foreignKey: "merchantId", as: "codes" });
-Merchant.hasMany(Address, { foreignKey: "merchantId", as: "addresses" });
-Merchant.hasMany(PhoneNumber, { foreignKey: "merchantId", as: "phoneNumbers" });
-Merchant.hasMany(MerchantVerification, { foreignKey: "merchantId", as: "verifications" });
-Merchant.hasMany(Product, { foreignKey: "merchantId", as: "products" });
+    @Column({
+        allowNull: false,
+        type: DataType.STRING,
+    })
+    declare firstName: string;
+
+    @Column({
+        allowNull: false,
+        type: DataType.STRING,
+    })
+    declare lastName: string;
+
+    @Column({
+        allowNull: false,
+        type: DataType.STRING,
+    })
+    declare brandName: string;
+
+    @Column({
+        allowNull: false,
+        type: DataType.STRING,
+    })
+    declare password: string;
+
+    @Column({
+        type: DataType.DATE,
+    })
+    declare dateOfBirth: Date;
+
+    @Column({
+        allowNull: false,
+        type: DataType.ENUM("INDIVIDUAL", "COMPANY"),
+    })
+    declare type: "INDIVIDUAL" | "COMPANY";
+
+    @Column({
+        allowNull: false,
+        type: DataType.BOOLEAN,
+        defaultValue: false,
+    })
+    declare emailVerified: boolean;
+
+    @Column({
+        allowNull: false,
+        type: DataType.BOOLEAN,
+        defaultValue: false,
+    })
+    declare isDeleted: boolean;
+
+    @HasMany(() => Code, { foreignKey: "merchantId", as: "codes" })
+    declare codes: Code[];
+
+    @HasMany(() => Address, { foreignKey: "merchantId", as: "addresses" })
+    declare addresses: Address[];
+
+    @HasMany(() => PhoneNumber, { foreignKey: "merchantId", as: "phoneNumbers" })
+    declare phoneNumbers: PhoneNumber[];
+
+    @HasMany(() => MerchantVerification, { foreignKey: "merchantId", as: "verifications" })
+    declare verifications: MerchantVerification[];
+
+    @HasMany(() => Product, { foreignKey: "merchantId", as: "products" })
+    declare products: Product[];
+}

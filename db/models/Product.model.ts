@@ -1,69 +1,82 @@
-import { DataTypes, Model } from "sequelize";
-import { databaseService } from "../../src/utils/database";
-
-// Import Related Models
+import { Model, Table, Column, DataType, ForeignKey, BelongsTo, HasMany } from "sequelize-typescript";
 import { Merchant } from "./Merchant.model";
 import { ProductImage } from "./ProductImage.model";
 import { TransactionProduct } from "./TransactionProduct.model";
 import { CartProduct } from "./CartProduct.model";
 
-
-const sequelize = databaseService.sequelize;
-export class Product extends Model { }
-
-Product.init({
-    id: {
+@Table({ modelName: "Product" })
+export class Product extends Model<Product> {
+    @Column({
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER,
-    },
-    merchantId: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Merchant",
-            key: "id",
-        }
-    },
-    name: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    description: {
-        type: DataTypes.STRING,
-    },
-    displayImage: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    type: {
-        allowNull: false,
-        type: DataTypes.ENUM("USED", "NEW"),
-    },
-    price: {
-        allowNull: false,
-        type: DataTypes.DECIMAL(10, 2),
-    },
-    prevPrice: {
-        type: DataTypes.DECIMAL(10, 2),
-    },
-    stock: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-    },
-    isDeleted: {
-        allowNull: false,
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    },
-}, {
-    sequelize,
-    modelName: "Product"
-})
+        type: DataType.INTEGER,
+    })
+    declare id: number;
 
-// Define Relationships
-Product.belongsTo(Merchant, { foreignKey: "merchantId", as: "merchant" });
-Product.hasMany(ProductImage, { foreignKey: "productId", as: "images" });
-Product.hasMany(TransactionProduct, { foreignKey: "productId", as: "transactions" });
-Product.hasMany(CartProduct, { foreignKey: "productId", as: "carts" });
+    @ForeignKey(() => Merchant)
+    @Column({
+        allowNull: false,
+        type: DataType.INTEGER,
+    })
+    declare merchantId: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.STRING,
+    })
+    declare name: string;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    declare description: string;
+
+    @Column({
+        allowNull: false,
+        type: DataType.STRING,
+    })
+    declare displayImage: string;
+
+    @Column({
+        allowNull: false,
+        type: DataType.ENUM("USED", "NEW"),
+    })
+    declare type: "USED" | "NEW";
+
+    @Column({
+        allowNull: false,
+        type: DataType.DECIMAL(10, 2),
+    })
+    declare price: number;
+
+    @Column({
+        type: DataType.DECIMAL(10, 2),
+    })
+    declare prevPrice: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.INTEGER,
+    })
+    declare stock: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.BOOLEAN,
+        defaultValue: false,
+    })
+    declare isDeleted: boolean;
+
+    @BelongsTo(() => Merchant, "merchantId")
+    declare merchant: Merchant;
+
+    @HasMany(() => ProductImage, "productId")
+    declare images: ProductImage[];
+
+    @HasMany(() => TransactionProduct, "productId")
+    declare transactions: TransactionProduct[];
+
+    @HasMany(() => CartProduct, "productId")
+    declare carts: CartProduct[];
+}

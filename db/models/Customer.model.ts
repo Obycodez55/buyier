@@ -1,7 +1,4 @@
-import { DataTypes, Model } from "sequelize";
-import { databaseService } from "../../src/utils/database";
-
-// Import Related Models
+import { Model, Table, Column, DataType, HasMany } from "sequelize-typescript";
 import { Code } from "./Code.model";
 import { Address } from "./Address.model";
 import { CartProduct } from "./CartProduct.model";
@@ -10,56 +7,77 @@ import { Delivery } from "./Delivery.model";
 import { Transaction } from "./Transaction.model";
 import { Rating } from "./Rating.model";
 
-const sequelize = databaseService.sequelize;
-export class Customer extends Model { }
+// Import Related Models
 
-Customer.init({
-    id: {
+@Table({ 
+    modelName: "Customer",
+    paranoid: true,
+    timestamps: true,
+ })
+export class Customer extends Model<Customer> {
+    @Column({
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER,
-    },
-    email: {
+        type: DataType.INTEGER,
+    })
+    declare id: number;
+
+    @Column({
         allowNull: false,
         unique: true,
-        type: DataTypes.STRING,
-    },
-    firstName: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    lastName: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    password: {
-        allowNull: false,
-        type: DataTypes.STRING,
-    },
-    dateOfBirth: {
-        type: DataTypes.DATE,
-    },
-    emailVerified: {
-        allowNull: false,
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    },
-    isDeleted: {
-        allowNull: false,
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    }
-}, {
-    sequelize,
-    modelName: "Customer"
-})
+        type: DataType.STRING,
+    })
+    declare email: string;
 
-// Define Relationships
-Customer.hasMany(Code, { foreignKey: "customerId", as: "codes" });
-Customer.hasMany(Address, { foreignKey: "customerId", as: "addresses" });
-Customer.hasMany(CartProduct, { foreignKey: "customerId", as: "cart" });
-Customer.hasMany(PhoneNumber, { foreignKey: "customerId", as: "phoneNumbers" });
-Customer.hasMany(Delivery, { foreignKey: "customerId", as: "deliveries" });
-Customer.hasMany(Transaction, { foreignKey: "customerId", as: "transactions" });
-Customer.hasMany(Rating, { foreignKey: "customerId", as: "ratings" });
+    @Column({
+        allowNull: false,
+        type: DataType.STRING,
+    })
+    declare firstName: string;
+
+    @Column({
+        allowNull: false,
+        type: DataType.STRING,
+    })
+    declare lastName: string;
+
+    @Column({
+        allowNull: false,
+        type: DataType.STRING,
+    })
+    declare password: string;
+
+    @Column({
+        type: DataType.DATE,
+    })
+    declare dateOfBirth: Date;
+
+    @Column({
+        allowNull: false,
+        type: DataType.BOOLEAN,
+        defaultValue: false,
+    })
+    declare emailVerified: boolean;
+
+    @HasMany(() => Code, { foreignKey: "customerId", as: "codes" })
+    declare codes: Code[];
+
+    @HasMany(() => Address, { foreignKey: "customerId", as: "addresses" })
+    declare addresses: Address[];
+
+    @HasMany(() => CartProduct, { foreignKey: "customerId", as: "cart" })
+    declare cart: CartProduct[];
+
+    @HasMany(() => PhoneNumber, { foreignKey: "customerId", as: "phoneNumbers" })
+    declare phoneNumbers: PhoneNumber[];
+
+    @HasMany(() => Delivery, { foreignKey: "customerId", as: "deliveries" })
+    declare deliveries: Delivery[];
+
+    @HasMany(() => Transaction, { foreignKey: "customerId", as: "transactions" })
+    declare transactions: Transaction[];
+
+    @HasMany(() => Rating, { foreignKey: "customerId", as: "ratings" })
+    declare ratings: Rating[];
+}

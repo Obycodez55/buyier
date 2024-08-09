@@ -1,59 +1,61 @@
-import { DataTypes, Model } from "sequelize";
-import { databaseService } from "../../src/utils/database";
-
-// Import Related Models
+import { Model, Table, Column, DataType, ForeignKey, BelongsTo, HasOne } from "sequelize-typescript";
 import { Transaction } from "./Transaction.model";
 import { Customer } from "./Customer.model";
 
-const sequelize = databaseService.sequelize;
-export class Delivery extends Model { }
+// Import Related Models
 
-Delivery.init({
-    id: {
+@Table({ modelName: "Delivery", timestamps: false })
+export class Delivery extends Model<Delivery> {
+    @Column({
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER,
-    },
-    customerId: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Customer",
-            key: "id",
-        }
-    },
-    transactionId: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Transaction",
-            key: "id",
-        }
-    },
-    type: {
-        allowNull: false,
-        type: DataTypes.ENUM('HOME', 'PICKUP'),
-    },
-    deliveryFee: {
-        allowNull: false,
-        type: DataTypes.FLOAT,
-    },
-    status: {
-        allowNull: false,
-        type: DataTypes.ENUM('PENDING', 'DELIVERED'),
-    },
-    date: {
-        allowNull: false,
-        type: DataTypes.DATE,
-        defaultValue: DataTypes.NOW,
-    },
-}, {
-    sequelize,
-    modelName: "Delivery",
-    timestamps: false,
-})
+        type: DataType.INTEGER,
+    })
+    declare id: number;
 
-// Define Relationships
-Delivery.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
-Delivery.hasOne(Transaction, { foreignKey: "transactionId", as: "transaction" });
+    @ForeignKey(() => Customer)
+    @Column({
+        allowNull: false,
+        type: DataType.INTEGER,
+    })
+    declare customerId: number;
+
+    @ForeignKey(() => Transaction)
+    @Column({
+        allowNull: false,
+        type: DataType.INTEGER,
+    })
+    declare transactionId: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.ENUM('HOME', 'PICKUP'),
+    })
+    declare type: 'HOME' | 'PICKUP';
+
+    @Column({
+        allowNull: false,
+        type: DataType.FLOAT,
+    })
+    declare deliveryFee: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.ENUM('PENDING', 'DELIVERED'),
+    })
+    declare status: 'PENDING' | 'DELIVERED';
+
+    @Column({
+        allowNull: false,
+        type: DataType.DATE,
+        defaultValue: DataType.NOW,
+    })
+    declare date: Date;
+
+    @BelongsTo(() => Customer, { foreignKey: "customerId", as: "customer" })
+    declare customer: Customer;
+
+    @HasOne(() => Transaction, { foreignKey: "transactionId", as: "transaction" })
+    declare transaction: Transaction;
+}

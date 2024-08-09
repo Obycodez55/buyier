@@ -1,53 +1,51 @@
-import { DataTypes, Model } from "sequelize";
-import { databaseService } from "../../src/utils/database";
-
-// Import Related Models
+import { Table, Column, Model, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Customer } from "./Customer.model";
 import { Product } from "./Product.model";
 
-const sequelize = databaseService.sequelize;
-export class CartProduct extends Model { }
-
-CartProduct.init({
-    id: {
+@Table({
+    modelName: "CartProduct",
+    paranoid: true,
+    timestamps: true,
+    version: true,
+})
+export class CartProduct extends Model<CartProduct> {
+    @Column({
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER,
-    },
-    customerId: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Customer",
-            key: "id",
-        }
-    },
-    productId: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Product",
-            key: "id",
-        }
-    },
-    quantity: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-    },
-    unitPrice: {
-        allowNull: false,
-        type: DataTypes.FLOAT,
-    },
-    totalAmount: {
-        allowNull: false,
-        type: DataTypes.FLOAT,
-    }
-}, {
-    sequelize,
-    modelName: "CartProduct",
-})
+    })
+    declare id: number;
 
-// Define Relationships
-CartProduct.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
-CartProduct.belongsTo(Product, { foreignKey: "productId", as: "product" });
+    @ForeignKey(() => Customer)
+    @Column({
+        allowNull: false,
+    })
+    declare customerId: number;
+
+    @ForeignKey(() => Product)
+    @Column({
+        allowNull: false,
+    })
+    declare productId: number;
+
+    @Column({
+        allowNull: false,
+    })
+    declare quantity: number;
+
+    @Column({
+        allowNull: false,
+    })
+    declare unitPrice: number;
+
+    @Column({
+        allowNull: false,
+    })
+    declare totalAmount: number;
+
+    @BelongsTo(() => Customer)
+    declare customer: Customer;
+
+    @BelongsTo(() => Product)
+    declare product: Product;
+}

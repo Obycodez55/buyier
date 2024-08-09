@@ -1,52 +1,51 @@
-import { DataTypes, Model } from "sequelize";
-import { databaseService } from "../../src/utils/database";
-
-// Import Related Models
+import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Product } from "./Product.model";
 import { Customer } from "./Customer.model";
 
-const sequelize = databaseService.sequelize;
-export class Rating extends Model { }
-
-Rating.init({
-    id: {
+@Table({ modelName: "Rating" })
+export class Rating extends Model<Rating> {
+    @Column({
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER,
-    },
-    productId: {
+        type: DataType.INTEGER,
+    })
+    declare id: number;
+
+    @ForeignKey(() => Product)
+    @Column({
         allowNull: false,
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Product",
-            key: "id",
-        }
-    },
-    customerId: {
+        type: DataType.INTEGER,
+    })
+    declare productId: number;
+
+    @ForeignKey(() => Customer)
+    @Column({
         allowNull: false,
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Customer",
-            key: "id",
-        }
-    },
-    rating: {
+        type: DataType.INTEGER,
+    })
+    declare customerId: number;
+
+    @Column({
         allowNull: false,
-        type: DataTypes.INTEGER,
+        type: DataType.INTEGER,
         validate: {
             min: 1,
             max: 5
         }
-    },
-    review: {
-        type: DataTypes.STRING,
-    },
-}, {
-    sequelize,
-    modelName: "Rating"
-})
+    })
+    declare rating: number;
 
-// Define Relationships
-Rating.belongsTo(Product, { foreignKey: "productId", as: "product" });
-Rating.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
+    @Column({
+        type: DataType.STRING,
+    })
+    declare review: string;
+
+    @BelongsTo(() => Product, { foreignKey: "productId", as: "product" })
+    declare product: Product;
+
+    @BelongsTo(() => Customer, { foreignKey: "customerId", as: "customer" })
+    declare customer: Customer;
+}
+
+export default Rating;

@@ -1,62 +1,65 @@
-import { DataTypes, Model } from "sequelize";
-import { databaseService } from "../../src/utils/database";
-
-// Import Related Models
+import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Customer } from "./Customer.model";
 import { Merchant } from "./Merchant.model";
 
-const sequelize = databaseService.sequelize;
-export class Code extends Model { }
-
-Code.init({
-    id: {
-        allowNull: false,
-        autoIncrement: true,
-        primaryKey: true,
-        type: DataTypes.INTEGER,
-    },
-    customerId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Customer",
-            key: "id",
-        }
-    },
-    merchantId: {
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Merchant",
-            key: "id",
-        }
-    },
-    type: {
-        allowNull: false,
-        type: DataTypes.ENUM('EMAIL', 'PASSWORD_RESET')
-    },
-    code: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-        validate: {
-            len: [4, 6]
-        },
-    },
-    expires: {
-        allowNull: false,
-        type: DataTypes.DATE,
-        defaultValue: () => new Date(new Date().getTime() + 15 * 60 * 1000)
-    }
-}, {
-    sequelize,
+@Table({ 
     modelName: "Code",
+    timestamps: true,
+    version: true,
     validate: {
-        eitherCustomerIdOrMerchantId() {
+        eitherCustomerIdOrMerchantId(this: Code) {
             if ((this.customerId && this.merchantId) || (!this.customerId && !this.merchantId)) {
                 throw new Error('Either customerId or merchantId must be provided, but not both.');
             }
         }
     }
 })
+export class Code extends Model<Code> {
+    @Column({
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataType.INTEGER,
+    })
+    declare id: number;
 
-// Define Relationships
-Code.belongsTo(Customer, { foreignKey: "customerId", as: "customer" });
-Code.belongsTo(Merchant, { foreignKey: "merchantId", as: "merchant" });
+    @ForeignKey(() => Customer)
+    @Column({
+        type: DataType.INTEGER,
+    })
+    declare customerId: number;
+
+    @ForeignKey(() => Merchant)
+    @Column({
+        type: DataType.INTEGER,
+    })
+    declare merchantId: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.ENUM('EMAIL', 'PASSWORD_RESET')
+    })
+    declare type: string;
+
+    @Column({
+        allowNull: false,
+        type: DataType.INTEGER,
+        validate: {
+            len: [4, 6]
+        },
+    })
+    declare code: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.DATE,
+        defaultValue: () => new Date(new Date().getTime() + 15 * 60 * 1000)
+    })
+    declare expires: Date;
+
+    @BelongsTo(() => Customer, { foreignKey: "customerId", as: "customer" })
+    declare customer: Customer;
+
+    @BelongsTo(() => Merchant, { foreignKey: "merchantId", as: "merchant" })
+    declare merchant: Merchant;
+}

@@ -1,51 +1,51 @@
-import { DataTypes, Model } from "sequelize";
-import { databaseService } from "../../src/utils/database";
-
-// Import Related Models
+import { Table, Column, Model, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Merchant } from "./Merchant.model";
 
-const sequelize = databaseService.sequelize;
-export class MerchantVerification extends Model { }
-
-MerchantVerification.init({
-    id: {
+@Table({
+    modelName: "MerchantVerification", 
+    createdAt: "dateOfApplication"
+})
+export class MerchantVerification extends Model<MerchantVerification> {
+    @Column({
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER,
-    },
-    merchantId: {
-        allowNull: false,
-        type: DataTypes.INTEGER,
-        references: {
-            model: "Merchant",
-            key: "id",
-        }
-    },
-    type: {
-        allowNull: false,
-        type: DataTypes.ENUM("BUSINESS_REGISTRATION", "IDENTITY_VERIFICATION"),
-    },
-    scope: {
-        allowNull: false,
-        type: DataTypes.ENUM("NIN", "CAC", "UTILITY_BILL", "PASSPORT", "DRIVERS_LICENSE"),
-    },
-    document: {
-        type: DataTypes.STRING,
-    },
-    status: {
-        allowNull: false,
-        type: DataTypes.ENUM("PENDING", "APPROVED", "REJECTED"),
-        defaultValue: "PENDING",
-    },
-    dateOfApproval: {
-        type: DataTypes.DATE,
-    },
-}, {
-    sequelize,
-    modelName: "MerchantVerification",
-    createdAt: "dateOfApplication"
-})
+        type: DataType.INTEGER,
+    })
+    declare id: number;
 
-// Define Relationships
-MerchantVerification.belongsTo(Merchant, { foreignKey: "merchantId", as: "merchant" });
+    @ForeignKey(() => Merchant)
+    @Column({
+        allowNull: false,
+        type: DataType.INTEGER,
+    })
+    declare merchantId: number;
+
+    @Column({
+        allowNull: false,
+        type: DataType.ENUM("BUSINESS_REGISTRATION", "IDENTITY_VERIFICATION"),
+    })
+    declare type: "BUSINESS_REGISTRATION" | "IDENTITY_VERIFICATION";
+
+    @Column({
+        allowNull: false,
+        type: DataType.ENUM("NIN", "CAC", "UTILITY_BILL", "PASSPORT", "DRIVERS_LICENSE"),
+    })
+    declare scope: "NIN" | "CAC" | "UTILITY_BILL" | "PASSPORT" | "DRIVERS_LICENSE";
+
+    @Column(DataType.STRING)
+    declare document: string;
+
+    @Column({
+        allowNull: false,
+        type: DataType.ENUM("PENDING", "APPROVED", "REJECTED"),
+        defaultValue: "PENDING",
+    })
+    declare status: "PENDING" | "APPROVED" | "REJECTED";
+
+    @Column(DataType.DATE)
+    declare dateOfApproval: Date;
+
+    @BelongsTo(() => Merchant, { foreignKey: "merchantId", as: "merchant" })
+    declare merchant: Merchant;
+}
