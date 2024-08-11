@@ -21,8 +21,8 @@ export class EmailService implements IEmailService {
     //     this.emailProvider = emailProvider;
     // }
 
-    public sendMail(to: string, subject: string, options: { template: EmailPaths; data: { [key: string]: any; }; }): Promise<void> {
-        return this.emailProvider.sendMail(to, subject, options);
+    public sendMail({ to, subject, options }: { to: string; subject: string; options: { template: EmailPaths; data: { [key: string]: any; }; }; }): Promise<void> {
+        return this.emailProvider.sendMail({ to, subject, options });
     }
 
 }

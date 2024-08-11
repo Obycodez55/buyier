@@ -3,6 +3,24 @@ import { Merchant } from "./Merchant.model";
 import { ProductImage } from "./ProductImage.model";
 import { TransactionProduct } from "./TransactionProduct.model";
 import { CartProduct } from "./CartProduct.model";
+import { Optional } from "sequelize";
+
+export interface IProduct {
+    id: string;
+    merchantId: string;
+    name: string;
+    description: string;
+    displayImage: string;
+    type: "USED" | "NEW";
+    price: number;
+    prevPrice: number;
+    stock: number;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date;
+}
+
+export interface IProductCreation extends Optional<IProduct, "id" | "createdAt" | "updatedAt"> { }
 
 @Table({
     modelName: "Product",
@@ -10,21 +28,21 @@ import { CartProduct } from "./CartProduct.model";
     paranoid: true,
     version: true,
 })
-export class Product extends Model {
+export class Product extends Model<IProduct, IProductCreation> {
     @Column({
         allowNull: false,
         primaryKey: true,
         defaultValue: DataType.UUIDV4,
         type: DataType.UUID,
     })
-    declare id: number;
+    declare id: string;
 
     @ForeignKey(() => Merchant)
     @Column({
         allowNull: false,
         type: DataType.UUID,
     })
-    declare merchantId: number;
+    declare merchantId: string;
 
     @Column({
         allowNull: false,
@@ -66,12 +84,6 @@ export class Product extends Model {
     })
     declare stock: number;
 
-    @Column({
-        allowNull: false,
-        type: DataType.BOOLEAN,
-        defaultValue: false,
-    })
-    declare isDeleted: boolean;
 
     @BelongsTo(() => Merchant, "merchantId")
     declare merchant: Merchant;

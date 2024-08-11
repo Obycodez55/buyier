@@ -12,7 +12,7 @@ export enum ErrorMessages {
     USER_NOT_FOUND = 'User Not Found',
     GET_USER_BY_ID_FAILED = 'Unable to Fetch User by ID',
     GET_USER_BY_EMAIL_FAILED = 'Unable to Fetch User by Email',
-    NO_AUTH_ERROR = 'No Auth Supplied',
+    NO_AUTH_ERROR = 'Authorization Header Missing',
     INVALID_AUTH_TOKEN_SUPPLIED = 'Invalid Auth Token Supplied',
     ADD_TO_CART_FAILED = 'Unable to Add Product to Cart',
     INVALID_PRODUCT_QUANTITY = 'Invalid Quantity',

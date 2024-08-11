@@ -1,5 +1,4 @@
-import { Customer } from "../../db/models/Customer.model";
-import { ICustomer } from "../interfaces/customer.interface";
+import { Customer, ICustomer, ICustomerCreation } from "../../db/models/Customer.model";
 import { ICustomerRepository } from "./interfaces/customer.repository.interface";
 
 
@@ -8,11 +7,7 @@ export class CustomerRepository implements ICustomerRepository {
     findAll(): Promise<ICustomer[]> {
         return new Promise(async (resolve, reject) => {
             try {
-                const customers = await Customer.findAll({
-                    where: {
-                        isDeleted: false
-                    }
-                });
+                const customers = await Customer.findAll();
                 resolve(
                     customers.map((customer) => customer as unknown as ICustomer)
                 );
@@ -22,13 +17,12 @@ export class CustomerRepository implements ICustomerRepository {
         });
     }
 
-    getCustomerById(id: number): Promise<ICustomer> {
+    getCustomerById(id: string): Promise<ICustomer> {
         return new Promise(async (resolve, reject) => {
             try {
                 const customer = await Customer.findOne({
                     where: {
-                        id,
-                        isDeleted: false
+                        id
                     }
                 });
                 resolve(customer as unknown as ICustomer);
@@ -43,8 +37,7 @@ export class CustomerRepository implements ICustomerRepository {
             try {
                 const customer = await Customer.findOne({
                     where: {
-                        email,
-                        isDeleted: false
+                        email
                     }
                 });
                 resolve(customer as unknown as ICustomer);
@@ -54,13 +47,12 @@ export class CustomerRepository implements ICustomerRepository {
         });
     }
 
-    update(updateData: ICustomer, id: number): Promise<boolean> {
+    update(updateData: Partial<ICustomer>, id: string): Promise<boolean> {
         return new Promise(async (resolve, reject) => {
             try {
                 await Customer.update({ ...updateData }, {
                     where: {
-                        id,
-                        isDeleted: false
+                        id
                     }
                 });
                 resolve(true);
@@ -70,7 +62,7 @@ export class CustomerRepository implements ICustomerRepository {
         });
     }
 
-    save(customer: Partial<ICustomer>): Promise<ICustomer> {
+    save(customer: ICustomerCreation): Promise<ICustomer> {
         return new Promise(async (resolve, reject) => {
             try {
                 const newCustomer = Customer.build(customer);

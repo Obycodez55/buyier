@@ -4,6 +4,21 @@ import { Table, Model, Column, ForeignKey, BelongsTo, DataType } from "sequelize
 import { Customer } from "./Customer.model";
 import { Merchant } from "./Merchant.model";
 
+export interface IAddress {
+    id: string;
+    customerId?: string;
+    merchantId?: string;
+    address: string;
+    city: string;
+    state: string;
+    country: string;
+    postalCode: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date;
+}
+
+export interface IAddressCreation extends Omit<IAddress, "id" | "createdAt" | "updatedAt"> { }
 
 @Table({
     modelName: "Address",
@@ -24,26 +39,26 @@ import { Merchant } from "./Merchant.model";
     timestamps: true,
     version: true,
 })
-export class Address extends Model {
+export class Address extends Model<IAddress, IAddressCreation> {
     @Column({
         allowNull: false,
         primaryKey: true,
         defaultValue: DataType.UUIDV4,
         type: DataType.UUID,
     })
-    declare id: number;
+    declare id: string;
 
     @ForeignKey(() => Customer)
     @Column({
         type: DataType.UUID,
     })
-    declare customerId: number;
+    declare customerId: string;
 
     @ForeignKey(() => Merchant)
     @Column({
         type: DataType.UUID,
     })
-    declare merchantId: number;
+    declare merchantId: string;
 
     @Column({
         allowNull: false,
@@ -80,4 +95,4 @@ export class Address extends Model {
 
     @BelongsTo(() => Merchant)
     declare merchant: Merchant;
- }
+}

@@ -6,8 +6,22 @@ import { PhoneNumber } from "./PhoneNumber.model";
 import { Delivery } from "./Delivery.model";
 import { Transaction } from "./Transaction.model";
 import { Rating } from "./Rating.model";
+import { Optional } from "sequelize";
 
-// Import Related Models
+export interface ICustomer{
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    password: string;
+    dateOfBirth?: Date;
+    emailVerified: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date;
+}
+
+export interface ICustomerCreation extends Optional<ICustomer, "id" | "emailVerified" | "createdAt" | "updatedAt"> {}
 
 @Table({ 
     modelName: "Customer",
@@ -15,14 +29,14 @@ import { Rating } from "./Rating.model";
     timestamps: true,
     version: true,
  })
-export class Customer extends Model {
+export class Customer extends Model<ICustomer, ICustomerCreation> {
     @Column({
         allowNull: false,
         primaryKey: true,
         defaultValue: DataType.UUIDV4,
         type: DataType.UUID,
     })
-    declare id: number;
+    declare id: string;
 
     @Column({
         allowNull: false,

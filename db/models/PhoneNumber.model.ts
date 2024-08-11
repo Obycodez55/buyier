@@ -1,9 +1,21 @@
 import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Customer } from "./Customer.model";
 import { Merchant } from "./Merchant.model";
+import { Optional } from "sequelize";
 
+export interface IPhoneNumber {
+    id: string;
+    customerId?: string;
+    merchantId?: string;
+    number: string;
+    isPrimary: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date;
+}
 
-@Table({ 
+export interface IPhoneNumberCreation extends Optional<IPhoneNumber, "id" | "isPrimary" | "createdAt"> { }
+@Table({
     modelName: "PhoneNumber",
     timestamps: true,
     paranoid: true,
@@ -14,28 +26,34 @@ import { Merchant } from "./Merchant.model";
                 throw new Error('Either customerId or merchantId must be provided, but not both.');
             }
         }
-    }
+    },
+    indexes: [
+        {
+            unique: false,
+            fields: ["customerId", "merchantId"]
+        }
+    ],
 })
-export class PhoneNumber extends Model {
+export class PhoneNumber extends Model<IPhoneNumber, IPhoneNumberCreation> {
     @Column({
         allowNull: false,
         primaryKey: true,
         defaultValue: DataType.UUIDV4,
         type: DataType.UUID,
     })
-    declare id: number;
+    declare id: string;
 
     @ForeignKey(() => Customer)
     @Column({
         type: DataType.UUID,
     })
-    declare customerId: number;
+    declare customerId: string;
 
     @ForeignKey(() => Merchant)
     @Column({
         type: DataType.UUID,
     })
-    declare merchantId: number;
+    declare merchantId: string;
 
     @Column({
         allowNull: false,

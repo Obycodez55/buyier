@@ -1,6 +1,6 @@
-import { ICustomer } from "../../interfaces/customer.interface";
+import { ICustomer } from "../../../db/models/Customer.model";
 
 export interface ICustomerRepository {
-    getCustomerById(id: number): Promise<ICustomer>;
+    getCustomerById(id: string): Promise<ICustomer>;
     getCustomerByEmail(email: string): Promise<ICustomer>;
 }

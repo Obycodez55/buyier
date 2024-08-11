@@ -1,7 +1,7 @@
 export interface IResponse {
     status: ResponseStatus;
     message: string;
-    data: any;
+    data?: any;
 }
 
 export enum ResponseStatus {

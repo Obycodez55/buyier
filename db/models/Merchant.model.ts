@@ -4,8 +4,24 @@ import { Address } from "./Address.model";
 import { MerchantVerification } from "./MerchantVerification.model";
 import { PhoneNumber } from "./PhoneNumber.model";
 import { Product } from "./Product.model";
+import { Optional } from "sequelize";
 
-// Import Related Models
+export interface IMerchant {
+    id: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    brandName: string;
+    password: string;
+    dateOfBirth?: Date;
+    type: "INDIVIDUAL" | "COMPANY";
+    emailVerified: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt?: Date;
+}
+
+export interface IMerchantCreation extends Optional<IMerchant, "id" | "emailVerified" | "createdAt" | "updatedAt"> { }
 
 
 @Table({
@@ -14,14 +30,14 @@ import { Product } from "./Product.model";
     timestamps: true,
     version: true,
 })
-export class Merchant extends Model {
+export class Merchant extends Model<IMerchant, IMerchantCreation> {
     @Column({
         allowNull: false,
         primaryKey: true,
         defaultValue: DataType.UUIDV4,
         type: DataType.UUID,
     })
-    declare id: number;
+    declare id: string;
 
     @Column({
         allowNull: false,
@@ -72,12 +88,6 @@ export class Merchant extends Model {
     })
     declare emailVerified: boolean;
 
-    @Column({
-        allowNull: false,
-        type: DataType.BOOLEAN,
-        defaultValue: false,
-    })
-    declare isDeleted: boolean;
 
     @HasMany(() => Code, { foreignKey: "merchantId", as: "codes" })
     declare codes: Code[];

@@ -1,36 +1,48 @@
 import { Model, Table, Column, DataType, ForeignKey, BelongsTo, HasOne } from "sequelize-typescript";
 import { Transaction } from "./Transaction.model";
 import { Customer } from "./Customer.model";
+import { Optional } from "sequelize";
 
-// Import Related Models
+export interface IDelivery {
+    id: string;
+    customerId: string;
+    transactionId: string;
+    type: 'HOME' | 'PICKUP';
+    deliveryFee: number;
+    status: 'PENDING' | 'DELIVERED';
+    date: Date;
+}
+
+export interface IDeliveryCreation extends Optional<IDelivery, "id" | "date"> { }
 
 @Table({
     modelName: "Delivery",
     timestamps: false,
     version: true,
+    createdAt: "date",
 })
-export class Delivery extends Model {
+export class Delivery extends Model<IDelivery, IDeliveryCreation> {
     @Column({
         allowNull: false,
         primaryKey: true,
         defaultValue: DataType.UUIDV4,
         type: DataType.UUID,
     })
-    declare id: number;
+    declare id: string;
 
     @ForeignKey(() => Customer)
     @Column({
         allowNull: false,
         type: DataType.UUID,
     })
-    declare customerId: number;
+    declare customerId: string;
 
     @ForeignKey(() => Transaction)
     @Column({
         allowNull: false,
         type: DataType.UUID,
     })
-    declare transactionId: number;
+    declare transactionId: string;
 
     @Column({
         allowNull: false,
@@ -49,13 +61,6 @@ export class Delivery extends Model {
         type: DataType.ENUM('PENDING', 'DELIVERED'),
     })
     declare status: 'PENDING' | 'DELIVERED';
-
-    @Column({
-        allowNull: false,
-        type: DataType.DATE,
-        defaultValue: DataType.NOW,
-    })
-    declare date: Date;
 
     @BelongsTo(() => Customer, { foreignKey: "customerId", as: "customer" })
     declare customer: Customer;

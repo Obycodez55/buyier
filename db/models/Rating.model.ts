@@ -1,34 +1,48 @@
 import { Model, Table, Column, DataType, ForeignKey, BelongsTo } from "sequelize-typescript";
 import { Product } from "./Product.model";
 import { Customer } from "./Customer.model";
+import { Optional } from "sequelize";
+
+export interface IRating {
+    id: string;
+    productId: string;
+    customerId: string;
+    rating: number;
+    review: string;
+    deletedAt?: Date;
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface IRatingCreation extends Optional<IRating, "id" | "createdAt" | "updatedAt"> {}
 
 @Table({ modelName: "Rating",
 timestamps: true,
 paranoid: true,
 version: true,
  })
-export class Rating extends Model {
+export class Rating extends Model<IRating, IRatingCreation> {
     @Column({
         allowNull: false,
         primaryKey: true,
         defaultValue: DataType.UUIDV4,
         type: DataType.UUID,
     })
-    declare id: number;
+    declare id: string;
 
     @ForeignKey(() => Product)
     @Column({
         allowNull: false,
         type: DataType.UUID,
     })
-    declare productId: number;
+    declare productId: string;
 
     @ForeignKey(() => Customer)
     @Column({
         allowNull: false,
         type: DataType.UUID,
     })
-    declare customerId: number;
+    declare customerId: string;
 
     @Column({
         allowNull: false,

@@ -18,7 +18,7 @@ export class NodemailerProvider implements IEmailService {
     constructor(logger: ILogger, OAuth2Client: OAuth2Client) {
         this.logger = logger;
         this.OAuth2Client = OAuth2Client;
-        
+
         this.transporter = createTransport({
             service: 'gmail',
             auth: {
@@ -32,7 +32,7 @@ export class NodemailerProvider implements IEmailService {
         });
     }
 
-    public sendMail(to: string, subject: string, options: { template: EmailPaths, data: { [key: string]: any } }): Promise<void> {
+    public sendMail({ to, subject, options }: { to: string; subject: string; options: { template: EmailPaths; data: { [key: string]: any; }; }; }): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             ejs.renderFile(options.template, options.data, (error, html) => {
                 if (error) {
