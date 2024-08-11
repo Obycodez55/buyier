@@ -11,8 +11,8 @@ export class CustomerRepository implements ICustomerRepository {
                 resolve(
                     customers.map((customer) => customer as unknown as ICustomer)
                 );
-            } catch (error) {
-                reject(error);
+            } catch (e) {
+                reject(e);
             }
         });
     }
@@ -26,8 +26,8 @@ export class CustomerRepository implements ICustomerRepository {
                     }
                 });
                 resolve(customer as unknown as ICustomer);
-            } catch (error) {
-                reject(error);
+            } catch (e) {
+                reject(e);
             }
         });
     }
@@ -41,10 +41,21 @@ export class CustomerRepository implements ICustomerRepository {
                     }
                 });
                 resolve(customer as unknown as ICustomer);
-            } catch (error) {
-                reject(error);
+            } catch (e) {
+                reject(e);
             }
         });
+    }
+
+    isVerified(id: string): Promise<boolean> {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const customer = await this.getCustomerById(id);
+                resolve(!!customer.emailVerifiedAt)
+            } catch (e) {
+                reject(e);
+            }
+        })
     }
 
     update(updateData: Partial<ICustomer>, id: string): Promise<boolean> {
@@ -68,8 +79,8 @@ export class CustomerRepository implements ICustomerRepository {
                 const newCustomer = Customer.build(customer);
                 await newCustomer.save();
                 resolve(newCustomer as unknown as ICustomer);
-            } catch (error) {
-                reject(error);
+            } catch (e) {
+                reject(e);
             }
         });
     }

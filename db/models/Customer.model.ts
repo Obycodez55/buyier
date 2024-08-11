@@ -1,5 +1,4 @@
 import { Model, Table, Column, DataType, HasMany } from "sequelize-typescript";
-import { Code } from "./Code.model";
 import { Address } from "./Address.model";
 import { CartProduct } from "./CartProduct.model";
 import { PhoneNumber } from "./PhoneNumber.model";
@@ -15,13 +14,13 @@ export interface ICustomer{
     lastName: string;
     password: string;
     dateOfBirth?: Date;
-    emailVerified: boolean;
+    emailVerifiedAt?: Date;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date;
 }
 
-export interface ICustomerCreation extends Optional<ICustomer, "id" | "emailVerified" | "createdAt" | "updatedAt"> {}
+export interface ICustomerCreation extends Optional<ICustomer, "id" | "createdAt" | "updatedAt"> {}
 
 @Table({ 
     modelName: "Customer",
@@ -69,14 +68,9 @@ export class Customer extends Model<ICustomer, ICustomerCreation> {
     declare dateOfBirth: Date;
 
     @Column({
-        allowNull: false,
-        type: DataType.BOOLEAN,
-        defaultValue: false,
+        type: DataType.DATE,
     })
-    declare emailVerified: boolean;
-
-    @HasMany(() => Code, { foreignKey: "customerId", as: "codes" })
-    declare codes: Code[];
+    declare emailVerifiedAt: Date;
 
     @HasMany(() => Address, { foreignKey: "customerId", as: "addresses" })
     declare addresses: Address[];
