@@ -4,6 +4,7 @@ import { IEmailService } from "./email.interface";
 import { NodemailerProvider } from "./providers/nodemailer.provider";
 import { ILogger } from "../logger/logger.interface";
 import { EmailPaths } from "../../constants/email-paths.enum";
+import { configService } from "../config/config.service";
 
 class OAuth2Client extends google.auth.OAuth2 { }
 export class EmailService implements IEmailService {
@@ -13,7 +14,12 @@ export class EmailService implements IEmailService {
 
     constructor() {
         this.logger = new WinstonLogger("EmailService");
-        this.OAuth2Client = new OAuth2Client();
+        this.OAuth2Client = new OAuth2Client(
+            configService.get<string>("GMAIL_CLIENT_ID"),
+            configService.get<string>("GMAIL_CLIENT_SECRET"),
+            configService.get<string>("GMAIL_REDIRECT_URI")
+        );
+        this.OAuth2Client.setCredentials({ refresh_token: configService.get<string>("GMAIL_REFRESH_TOKEN") });
         this.emailProvider = new NodemailerProvider(this.logger, this.OAuth2Client);
     }
     

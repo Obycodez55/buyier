@@ -19,7 +19,6 @@ export class NodemailerProvider implements IEmailService {
     constructor(logger: ILogger, OAuth2Client: OAuth2Client) {
         this.logger = logger;
         this.OAuth2Client = OAuth2Client;
-
         this.transporter = createTransport({
             service: 'gmail',
             auth: {

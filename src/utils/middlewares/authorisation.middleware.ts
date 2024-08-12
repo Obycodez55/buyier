@@ -5,19 +5,23 @@ import HttpException from "../exceptions/http.exception";
 import { JWTService } from "../jwt/jwt.service";
 import { ILogger } from "../logger/logger.interface";
 import { NextFunction, Request, RequestHandler, Response } from "express";
+import { MerchantService } from "../../services/merchant.service";
 
 
 export class AuthorisationMiddleware {
     constructor(
-        private readonly customerService: CustomerService,
         private readonly jwtService: JWTService,
-        private readonly logger: ILogger
-    ) { };
+        private readonly logger: ILogger,
+        private readonly customerService?: CustomerService,
+        private readonly merchantService?: MerchantService
+    ) {
+
+     };
 
     authenticate: RequestHandler = async (request: Request, respone: Response, next: NextFunction) => {
         try {
-            const customer = await this.validateRequest(request as { headers: { authorization: any } });
-            request.body.customer = customer;
+            const user = await this.validateRequest(request as { headers: { authorization: any } });
+            request.body.user = user;
             next();
         } catch (error) {
             next(error);
@@ -37,8 +41,8 @@ export class AuthorisationMiddleware {
         const token = auth.split(' ')[1];
         try {
             const { id } = this.jwtService.verifyToken(token);
-            const customer = await this.customerService.getCustomerById(id);
-            return customer;
+            const user = await this.customerService?.getCustomerById(id) || await this.merchantService?.getCustomerById(id);
+            return user;
         } catch (error) {
             this.logger.error(`${ErrorMessages.USER_UNAUTHORIZED}: ${error}`);
             throw new HttpException(httpStatus.UNAUTHORIZED, ErrorMessages.USER_UNAUTHORIZED);

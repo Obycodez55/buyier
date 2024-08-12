@@ -2,7 +2,6 @@ import { EventEmitter } from "stream";
 import { BcryptService } from "../../utils/bcrypt/bcrypt.service";
 import { ILogger } from "../../utils/logger/logger.interface";
 import { IAuthService } from "./auth.service.interface";
-import { IMerchantRepository } from "../../repositories/interfaces/merchant.repository.interface";
 import { JWTService } from "../../utils/jwt/jwt.service";
 import { VerifyEmailRequestDto } from "../../dtos/authDtos/verifyEmailRequest.dto";
 import { EmailVerificationRequestDto } from "../../dtos/authDtos/emailVerificationRequest.dto";

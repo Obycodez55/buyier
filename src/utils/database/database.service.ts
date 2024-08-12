@@ -6,7 +6,6 @@ import { configService } from "../config/config.service";
 import { Customer } from "../../../db/models/Customer.model";
 import { Address } from "../../../db/models/Address.model";
 import { CartProduct } from "../../../db/models/CartProduct.model";
-import { Code } from "../../../db/models/Code.model";
 import { Merchant } from "../../../db/models/Merchant.model";
 import { Delivery } from "../../../db/models/Delivery.model";
 import { MerchantVerification } from "../../../db/models/MerchantVerification.model";
@@ -42,7 +41,7 @@ export class DatabaseService {
             // models: [__dirname + '/../../**/*.model.ts'],
             // models: [__dirname + "../../db/"],
         });
-        this.sequelize.addModels([Address, Customer, CartProduct, Code, Merchant, Delivery, MerchantVerification, PhoneNumber, Product, ProductImage, Rating, Transaction, TransactionProduct]);
+        this.sequelize.addModels([Address, Customer, CartProduct, Merchant, Delivery, MerchantVerification, PhoneNumber, Product, ProductImage, Rating, Transaction, TransactionProduct]);
     }
 
     authenticate(force = false): void {

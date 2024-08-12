@@ -12,7 +12,7 @@ import errorHandler from './utils/middlewares/error-handler.middleware';
 const app: express.Express = express();
 
 // Connect to the Database
-databaseService.authenticate();
+databaseService.authenticate(true);
 
 app.set('port', process.env.PORT || 8080);
 app.use(express.json());

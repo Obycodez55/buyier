@@ -1,14 +1,14 @@
 import httpStatus from "http-status";
 import { ErrorMessages } from "../constants/error-messages.enum";
-import { ICustomerRepository } from "../repositories/interfaces/customer.repository.interface";
 import HttpException from "../utils/exceptions/http.exception";
 import { ILogger } from "../utils/logger/logger.interface";
 import { ICustomer } from "../../db/models/Customer.model";
+import { CustomerRepository } from "../repositories/customer.repository";
 
 
 export class CustomerService {
     constructor(
-        private readonly customerRepository: ICustomerRepository,
+        private readonly customerRepository: CustomerRepository,
         private readonly logger: ILogger
     ) {}
 
@@ -38,8 +38,8 @@ export class CustomerService {
         }
 
         if (!customer) {
-            this.logger.error(ErrorMessages.GET_CUSTOMER_EMAIL_FAILED);
-            throw new HttpException(httpStatus.NOT_FOUND, ErrorMessages.GET_CUSTOMER_EMAIL_FAILED);
+            this.logger.error(ErrorMessages.CUSTOMER_NOT_FOUND);
+            throw new HttpException(httpStatus.NOT_FOUND, ErrorMessages.CUSTOMER_NOT_FOUND);
         }
         return customer;
     }

@@ -34,14 +34,19 @@ export class AuthService implements IAuthService {
     private readonly jwtService: JWTService;
     private readonly emailService: EmailService;
     private readonly eventEmiter: EventEmitter;
-    // private readonly request: { protocol: string, host: string };
-    private context!: CustomerAuthService | MerchantAuthService;
+    private context: CustomerAuthService | MerchantAuthService;
+
+    public login!: (loginData: LoginRequestDto) => Promise<LoginResponseDto>;
+    public register!: (registerData: any) => Promise<boolean>;
+    public forgotPassword!: (forgotPasswordData: any) => Promise<boolean>;
+    public resetPassword!: (resetPasswordData: any) => Promise<boolean>;
+    public emailVerification!: (emailVerificationData: any) => Promise<boolean>;
+    public verifyEmail!: (verifyEmailData: any) => Promise<boolean>;
 
     constructor(
         logger: ILogger,
         bcryptService: BcryptService,
         jwtService: JWTService,
-        // request: { protocol: string, host: string },
         context: AuthServiceContext
     ) {
         this.logger = logger;
@@ -50,21 +55,7 @@ export class AuthService implements IAuthService {
         this.emailService = new EmailService();
         this.eventEmiter = eventEmmiter;
         this.initializeEventHandlers();
-        // this.request = request;
-        this.setContext(context);
-    }
 
-    // Type guard for CustomerContext
-    private isCustomerContext(context: AuthServiceContext): context is CustomerContext {
-        return context.context === "Customer";
-    }
-
-    // Type guard for MerchantContext
-    private isMerchantContext(context: AuthServiceContext): context is MerchantContext {
-        return context.context === "Merchant";
-    }
-
-    setContext(context: AuthServiceContext) {
         if (this.isCustomerContext(context)) {
             this.context = new CustomerAuthService(
                 context.userRepository,
@@ -81,7 +72,27 @@ export class AuthService implements IAuthService {
                 this.jwtService,
                 this.eventEmiter
             );
+        } else {
+            throw new Error("Invalid context provided");
         }
+
+        // Set the method references after context is initialized
+        this.login = this.context.login.bind(this.context);
+        this.register = this.context.register.bind(this.context);
+        this.forgotPassword = this.context.forgotPassword.bind(this.context);
+        this.resetPassword = this.context.resetPassword.bind(this.context);
+        this.emailVerification = this.context.emailVerification.bind(this.context);
+        this.verifyEmail = this.context.verifyEmail.bind(this.context);
+    }
+
+    // Type guard for CustomerContext
+    private isCustomerContext(context: AuthServiceContext): context is CustomerContext {
+        return context.context === "Customer";
+    }
+
+    // Type guard for MerchantContext
+    private isMerchantContext(context: AuthServiceContext): context is MerchantContext {
+        return context.context === "Merchant";
     }
 
     private getToken(payload: { [key: string]: any }) {
@@ -96,7 +107,6 @@ export class AuthService implements IAuthService {
             const { email, resetCode } = data;
             const payload = { email, resetCode };
             const token = this.getToken(payload);
-            // const link = `${this.request.protocol}://${this.request.host}/api/v1/auth/email/verifyEmail/${token}`;
             const link = token;
             await this.emailService.sendMail({
                 to: email,
@@ -112,7 +122,6 @@ export class AuthService implements IAuthService {
             const { email, verificationCode } = data;
             const payload = { email, verificationCode };
             const token = this.getToken(payload);
-            // const link = `${this.request.protocol}://${this.request.host}/api/v1/auth/email/verifyEmail/${token}`;
             const link = token;
             await this.emailService.sendMail({
                 to: email,
@@ -122,8 +131,7 @@ export class AuthService implements IAuthService {
                     data: { link }
                 }
             })
-        }
-        );
+        });
 
         this.eventEmiter.on("sendWelcomeEmail", async (data: { email: string, firstName: string, lastName: string }) => {
             const { email, firstName, lastName } = data;
@@ -138,22 +146,4 @@ export class AuthService implements IAuthService {
         });
 
     }
-
-
-    login: (loginData: LoginRequestDto) => Promise<LoginResponseDto> = this.context.login;
-
-
-    register: (registerData: any) => Promise<boolean> = this.context.register;
-
-
-    forgotPassword: (forgotPasswordData: any) => Promise<boolean> = this.context.forgotPassword;
-
-
-    resetPassword: (resetPasswordData: any) => Promise<boolean> = this.context.resetPassword;
-
-
-    emailVerification: (emailVerificationData: any) => Promise<boolean> = this.context.emailVerification;
-
-
-    verifyEmail: (verifyEmailData: any) => Promise<boolean> = this.context.verifyEmail;
 }
