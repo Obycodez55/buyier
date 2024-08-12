@@ -5,8 +5,13 @@ import MerchantAuthRouter from "./merchant.auth.routes";
 
 const router = Router();
 
-router.get("/customer",CustomerAuthRouter);
+router.get("/",(req,res)=>{
+    res.send("Auth Service is up and running");
 
-router.get("/merchant",MerchantAuthRouter);
+});
+
+router.use("/customer",CustomerAuthRouter);
+
+router.use("/merchant",MerchantAuthRouter);
 
 export default router;

@@ -3,6 +3,7 @@ export enum LoggerPath {
     NodemailerEmailService = "logs/email-service.log",
     CustomerAuthService = "logs/customer-auth-service.log",
     MerchantAuthService = "logs/merchant-auth-service.log",
+    EmailService = "logs/email-service.log",
 }
 
 export interface LoggerPathIndex {

@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import { IEmailService } from "../email.interface";
-import { createTransport, Transporter } from "nodemailer";
+import { createTransport, Transport, Transporter } from "nodemailer";
 import { configService } from "../../config/config.service";
 import { ILogger } from "../../logger/logger.interface";
 import { CompanyDetails } from "../../../constants/company-details";
@@ -13,7 +13,7 @@ class OAuth2Client extends google.auth.OAuth2 { }
 
 export class NodemailerProvider implements IEmailService {
     private readonly OAuth2Client: OAuth2Client;
-    private readonly transporter: Transporter;
+    private readonly transporter: any;
     private logger: ILogger;
 
     constructor(logger: ILogger, OAuth2Client: OAuth2Client) {
@@ -27,14 +27,15 @@ export class NodemailerProvider implements IEmailService {
                 clientId: configService.get<string>("GMAIL_CLIENT_ID"),
                 clientSecret: configService.get<string>("GMAIL_CLIENT_SECRET"),
                 refreshToken: configService.get<string>("GMAIL_REFRESH_TOKEN"),
-                accessToken: this.OAuth2Client.getAccessToken() as any,
             },
         });
     }
 
     public sendMail({ to, subject, options }: { to: string; subject: string; options: { template: EmailPaths; data: { [key: string]: any; }; }; }): Promise<void> {
+        this.transporter.accessToken = this.OAuth2Client.getAccessToken() as any;
+
         return new Promise<void>((resolve, reject) => {
-            const template = path.resolve("view/emails", options.template)
+            const template = path.resolve("view/emails", options.template);
             ejs.renderFile(template, options.data, (error, html) => {
                 if (error) {
                     this.logger.error("Error rendering email template", error);
@@ -46,7 +47,7 @@ export class NodemailerProvider implements IEmailService {
                     to,
                     subject,
                     html
-                }, (err, info) => {
+                }, (err: any, info: any) => {
                     if (err) {
                         this.logger.error("Error sending email", err);
                         reject(err);
