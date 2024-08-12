@@ -4,10 +4,10 @@ export class LoginRequestDto {
   @IsDefined()
   @IsNotEmpty()
   @IsEmail()
-  email: string;
+  declare email: string;
 
   @IsDefined()
   @IsNotEmpty()
   @IsString()
-  password: string;
+  declare password: string;
 }

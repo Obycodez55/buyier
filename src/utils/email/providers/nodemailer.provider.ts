@@ -6,6 +6,7 @@ import { ILogger } from "../../logger/logger.interface";
 import { CompanyDetails } from "../../../constants/company-details";
 import { EmailPaths } from "../../../constants/email-paths.enum";
 import * as ejs from "ejs";
+import path from "path";
 
 
 class OAuth2Client extends google.auth.OAuth2 { }
@@ -34,7 +35,8 @@ export class NodemailerProvider implements IEmailService {
 
     public sendMail({ to, subject, options }: { to: string; subject: string; options: { template: EmailPaths; data: { [key: string]: any; }; }; }): Promise<void> {
         return new Promise<void>((resolve, reject) => {
-            ejs.renderFile(options.template, options.data, (error, html) => {
+            const template = path.resolve("view/emails", options.template)
+            ejs.renderFile(template, options.data, (error, html) => {
                 if (error) {
                     this.logger.error("Error rendering email template", error);
                     reject(error);

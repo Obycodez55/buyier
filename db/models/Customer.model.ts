@@ -15,6 +15,8 @@ export interface ICustomer{
     password: string;
     dateOfBirth?: Date;
     emailVerifiedAt?: Date;
+    emailVerificationCode?: string;
+    passwordResetCode?: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date;
@@ -27,6 +29,12 @@ export interface ICustomerCreation extends Optional<ICustomer, "id" | "createdAt
     paranoid: true,
     timestamps: true,
     version: true,
+    indexes: [
+        {
+            unique: true,
+            fields: ["email"],
+        },
+    ],
  })
 export class Customer extends Model<ICustomer, ICustomerCreation> {
     @Column({

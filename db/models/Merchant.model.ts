@@ -14,7 +14,9 @@ export interface IMerchant {
     password: string;
     dateOfBirth?: Date;
     type: "INDIVIDUAL" | "COMPANY";
-    emailVerifiedAt: Date;
+    emailVerifiedAt?: Date;
+    emailVerificationCode?: string;
+    passwordResetCode?: string;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date;
@@ -28,6 +30,12 @@ export interface IMerchantCreation extends Optional<IMerchant, "id" | "createdAt
     paranoid: true,
     timestamps: true,
     version: true,
+    indexes: [
+        {
+            unique: true,
+            fields: ["email", "brandName"],
+        },
+    ],
 })
 export class Merchant extends Model<IMerchant, IMerchantCreation> {
     @Column({
@@ -59,6 +67,7 @@ export class Merchant extends Model<IMerchant, IMerchantCreation> {
 
     @Column({
         allowNull: false,
+        unique: true,
         type: DataType.STRING,
     })
     declare brandName: string;
