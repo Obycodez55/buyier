@@ -88,10 +88,10 @@ export class MerchantRepository implements IMerchantRepository {
         });
     }
 
-    save(customer: IMerchantCreation): Promise<IMerchant> {
+    save(merchant: IMerchantCreation): Promise<IMerchant> {
         return new Promise(async (resolve, reject) => {
             try {
-                const newMerchant = Merchant.build(customer);
+                const newMerchant = Merchant.build(merchant);
                 await newMerchant.save();
                 resolve(newMerchant as unknown as IMerchant);
             } catch (e) {

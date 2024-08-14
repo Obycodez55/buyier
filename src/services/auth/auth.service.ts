@@ -35,6 +35,7 @@ export class AuthService implements IAuthService {
     private readonly emailService: EmailService;
     private readonly eventEmiter: EventEmitter;
     private context: CustomerAuthService | MerchantAuthService;
+    private readonly contextText: string;
 
     public login!: (loginData: LoginRequestDto) => Promise<LoginResponseDto>;
     public register!: (registerData: any) => Promise<boolean>;
@@ -54,6 +55,7 @@ export class AuthService implements IAuthService {
         this.jwtService = jwtService;
         this.emailService = new EmailService();
         this.eventEmiter = eventEmmiter;
+        this.contextText = context.context;
         this.initializeEventHandlers();
 
         if (this.isCustomerContext(context)) {
@@ -98,12 +100,11 @@ export class AuthService implements IAuthService {
     private getToken(payload: { [key: string]: any }) {
         const hash = this.jwtService.signPayload(payload, "15m");
         const token = cryptoService.encrypt(hash);
-        const encrypted = cryptoService.encrypt(token);
-        return encrypted;
+        return token;
     }
 
     initializeEventHandlers() {
-        this.eventEmiter.on("sendPasswordResetEmail", async (data: { email: string, resetCode: string }) => {
+        this.eventEmiter.on(`send${this.contextText}PasswordResetEmail`, async (data: { email: string, resetCode: string }) => {
             const { email, resetCode } = data;
             const payload = { email, resetCode };
             const token = this.getToken(payload);
@@ -118,7 +119,7 @@ export class AuthService implements IAuthService {
             })
         });
 
-        this.eventEmiter.on("sendEmailVerificationEmail", async (data: { email: string, verificationCode: string }) => {
+        this.eventEmiter.on(`send${this.contextText}EmailVerificationEmail`, async (data: { email: string, verificationCode: string }) => {
             const { email, verificationCode } = data;
             const payload = { email, verificationCode };
             const token = this.getToken(payload);
@@ -133,7 +134,7 @@ export class AuthService implements IAuthService {
             })
         });
 
-        this.eventEmiter.on("sendWelcomeEmail", async (data: { email: string, firstName: string, lastName: string }) => {
+        this.eventEmiter.on(`send${this.contextText}WelcomeEmail`, async (data: { email: string, firstName: string, lastName: string }) => {
             const { email, firstName, lastName } = data;
             await this.emailService.sendMail({
                 to: email,

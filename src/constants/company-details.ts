@@ -1,3 +1,3 @@
 export enum CompanyDetails {
-    SUPPORT_EMAIL = ""
+    SUPPORT_EMAIL = "obikoyaadebayo55@gmail.com"
 }

@@ -15,8 +15,8 @@ export interface IMerchant {
     dateOfBirth?: Date;
     type: "INDIVIDUAL" | "COMPANY";
     emailVerifiedAt?: Date;
-    emailVerificationCode?: string;
-    passwordResetCode?: string;
+    emailVerificationCode?: string | null;
+    passwordResetCode?: string | null;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date;
@@ -93,6 +93,16 @@ export class Merchant extends Model<IMerchant, IMerchantCreation> {
         type: DataType.DATE,
     })
     declare emailVerifiedAt: Date;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    declare emailVerificationCode: string;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    declare passwordResetCode: string;
 
     @HasMany(() => Address, { foreignKey: "merchantId", as: "addresses" })
     declare addresses: Address[];

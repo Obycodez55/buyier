@@ -75,12 +75,12 @@ export class CustomerAuthService implements IAuthService {
             const newCustomer = await this.customerRepository.save(newCustomerData);
 
             // Send welcome email
-            this.eventEmiter.emit("sendWelcomeEmail", { email, firstName, lastName });
+            this.eventEmiter.emit("sendCustomerWelcomeEmail", { email, firstName, lastName });
 
             // Send email verification code
             const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             await this.customerRepository.update({ emailVerificationCode: verificationCode }, newCustomer.id);
-            this.eventEmiter.emit("sendEmailVerificationEmail", { email, verificationCode });
+            this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, verificationCode });
             return true;
         } catch (e) {
             this.logger.error(`${ErrorMessages.REGISTER_CUSTOMER_FAILED}: ${e}`);
@@ -97,7 +97,7 @@ export class CustomerAuthService implements IAuthService {
         }
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
         await this.customerRepository.update({ emailVerificationCode: verificationCode }, customer.id);
-        this.eventEmiter.emit("sendEmailVerificationEmail", { email, verificationCode });
+        this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, verificationCode });
         return true;
     }
 
@@ -115,7 +115,7 @@ export class CustomerAuthService implements IAuthService {
                 this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
                 throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_VERIFICATION_TOKEN);
             }
-            await this.customerRepository.update({ emailVerifiedAt: new Date() }, customer.id);
+            await this.customerRepository.update({ emailVerifiedAt: new Date(), emailVerificationCode: null }, customer.id);
             return true;
         } catch (e) {
             if (e instanceof JsonWebTokenError) {
@@ -138,7 +138,7 @@ export class CustomerAuthService implements IAuthService {
         }
         const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
         await this.customerRepository.update({ passwordResetCode: resetCode }, customer.id);
-        this.eventEmiter.emit("sendPasswordResetEmail", { email, resetCode });
+        this.eventEmiter.emit("sendCustomerPasswordResetEmail", { email, resetCode });
         return true;
     }
 
@@ -156,7 +156,8 @@ export class CustomerAuthService implements IAuthService {
                 this.logger.error(ErrorMessages.INVALID_RESET_TOKEN);
                 throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_RESET_TOKEN);
             }
-            await this.customerRepository.update({ password: newPassword }, customer.id);
+            const hashedPassword = await this.bcryptService.hashPassword(newPassword);
+            await this.customerRepository.update({ password: hashedPassword, passwordResetCode: null }, customer.id);
             return true;
         } catch (e) {
             if (e instanceof JsonWebTokenError) {

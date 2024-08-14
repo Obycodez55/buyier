@@ -26,7 +26,7 @@ const customerAuthService = new AuthService(logger, bcryptService, jwtService,{
 });
 const authController = new AuthController(customerAuthService);
 
-const router = Router();
+const  router = Router();
 
 router.post("/login", validateBody(LoginRequestDto) ,authController.login);
 

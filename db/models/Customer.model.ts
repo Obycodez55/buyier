@@ -15,8 +15,8 @@ export interface ICustomer{
     password: string;
     dateOfBirth?: Date;
     emailVerifiedAt?: Date;
-    emailVerificationCode?: string;
-    passwordResetCode?: string;
+    emailVerificationCode?: string | null;
+    passwordResetCode?: string | null;
     createdAt: Date;
     updatedAt: Date;
     deletedAt?: Date;
@@ -79,6 +79,16 @@ export class Customer extends Model<ICustomer, ICustomerCreation> {
         type: DataType.DATE,
     })
     declare emailVerifiedAt: Date;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    declare emailVerificationCode: string;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    declare passwordResetCode: string;
 
     @HasMany(() => Address, { foreignKey: "customerId", as: "addresses" })
     declare addresses: Address[];

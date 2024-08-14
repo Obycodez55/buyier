@@ -1,6 +1,6 @@
 import { google } from "googleapis";
 import { IEmailService } from "../email.interface";
-import { createTransport, Transport, Transporter } from "nodemailer";
+import { createTransport, Transporter } from "nodemailer";
 import { configService } from "../../config/config.service";
 import { ILogger } from "../../logger/logger.interface";
 import { CompanyDetails } from "../../../constants/company-details";
@@ -13,7 +13,7 @@ class OAuth2Client extends google.auth.OAuth2 { }
 
 export class NodemailerProvider implements IEmailService {
     private readonly OAuth2Client: OAuth2Client;
-    private readonly transporter: any;
+    private readonly transporter: Transporter;
     private logger: ILogger;
 
     constructor(logger: ILogger, OAuth2Client: OAuth2Client) {
@@ -32,7 +32,7 @@ export class NodemailerProvider implements IEmailService {
     }
 
     public sendMail({ to, subject, options }: { to: string; subject: string; options: { template: EmailPaths; data: { [key: string]: any; }; }; }): Promise<void> {
-        this.transporter.accessToken = this.OAuth2Client.getAccessToken() as any;
+        (this.transporter as any).accessToken = this.OAuth2Client.getAccessToken() as any;
 
         return new Promise<void>((resolve, reject) => {
             const template = path.resolve("view/emails", options.template);
@@ -47,13 +47,13 @@ export class NodemailerProvider implements IEmailService {
                     to,
                     subject,
                     html
-                }, (err: any, info: any) => {
+                }, (err, info) => {
                     if (err) {
                         this.logger.error("Error sending email", err);
                         reject(err);
                         return;
                     }
-                    this.logger.info("Email sent successfully", info);
+                    this.logger.info("Email sent successfully", {info: info.envelope, id: info.messageId, accepted: info.accepted, rejected: info.rejected});
                     resolve();
                 });
             });

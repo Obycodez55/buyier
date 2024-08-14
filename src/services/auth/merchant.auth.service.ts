@@ -13,7 +13,7 @@ import { MerchantRepository } from "../../repositories/merchant.repository";
 import { cryptoService } from "../../utils/crypto";
 import { JsonWebTokenError } from "jsonwebtoken";
 
-export class MerchantAuthService implements IAuthService{
+export class MerchantAuthService implements IAuthService {
     private readonly merchantRepository: MerchantRepository;
     private readonly logger: ILogger;
     private readonly bcryptService: BcryptService;
@@ -35,21 +35,21 @@ export class MerchantAuthService implements IAuthService{
     }
 
     async login(loginData: any): Promise<any> {
-        const {email, password} = loginData;
+        const { email, password } = loginData;
 
         const merchant = await this.merchantRepository.getMerchantByEmail(email);
-        if(!merchant){
+        if (!merchant) {
             this.logger.error(ErrorMessages.INVALID_EMAIL_PASSWORD);
             throw new HttpException(httpStatus.UNAUTHORIZED, ErrorMessages.INVALID_EMAIL_PASSWORD);
         }
 
         const isPasswordMatch = await this.bcryptService.comparePassword(password, merchant.password);
-        if(!isPasswordMatch){
+        if (!isPasswordMatch) {
             this.logger.error(ErrorMessages.INVALID_EMAIL_PASSWORD);
             throw new HttpException(httpStatus.UNAUTHORIZED, ErrorMessages.INVALID_EMAIL_PASSWORD);
         }
 
-        const payload = {email: merchant.email, id: merchant.id};
+        const payload = { email: merchant.email, id: merchant.id };
         const token = this.jwtService.signPayload(payload);
         const response = new LoginResponseDto();
         response.token = token;
@@ -57,24 +57,33 @@ export class MerchantAuthService implements IAuthService{
     }
 
     async register(registerData: any): Promise<boolean> {
-        const {email, password} = registerData;
-
+        const { email, firstName, lastName, password } = registerData;
         // Check if email is already registered
         const merchant = await this.merchantRepository.getMerchantByEmail(email);
-        if(merchant){
+        
+        if (merchant) {
             this.logger.error(ErrorMessages.EMAIL_EXISTS);
             throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.EMAIL_EXISTS);
         }
         // Check if brand name is already registered
         const merchantBrand = await this.merchantRepository.getMerchantByBrandName(registerData.brandName);
-        if(merchantBrand){
+        if (merchantBrand) {
             this.logger.error(ErrorMessages.BRAND_NAME_EXISTS);
             throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.BRAND_NAME_EXISTS);
         }
         try {
             const hashedPassword = await this.bcryptService.hashPassword(password);
-            const newMerchant = {...registerData, password: hashedPassword};
+            const newMerchant = { ...registerData, password: hashedPassword };
             await this.merchantRepository.save(newMerchant);
+
+            // Send welcome email
+            this.eventEmiter.emit("sendMerchantWelcomeEmail", { email, firstName, lastName });
+
+            // Send email verification code
+            const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
+            await this.merchantRepository.update({ emailVerificationCode: verificationCode }, newMerchant.id);
+            this.eventEmiter.emit("sendMerchantEmailVerificationEmail", { email, verificationCode });
+
             return true;
         } catch (e) {
             this.logger.error(`${ErrorMessages.REGISTER_MERCHANT_FAILED}: ${e}`);
@@ -90,8 +99,8 @@ export class MerchantAuthService implements IAuthService{
             throw new HttpException(httpStatus.NOT_FOUND, ErrorMessages.MERCHANT_NOT_FOUND);
         }
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-        await this.merchantRepository.update({emailVerificationCode: verificationCode}, merchant.id);
-        this.eventEmiter.emit("sendEmailVerificationEmail", { email, verificationCode });
+        await this.merchantRepository.update({ emailVerificationCode: verificationCode }, merchant.id);
+        this.eventEmiter.emit("sendMerchantEmailVerificationEmail", { email, verificationCode });
         return true;
     }
 
@@ -100,7 +109,7 @@ export class MerchantAuthService implements IAuthService{
             const { token } = verifyEmailData;
             const decrypted = cryptoService.decrypt(token);
             const { email, verificationCode } = this.jwtService.verifyToken(decrypted);
-            const merchant = await this.merchantRepository.getMerchantById(email);
+            const merchant = await this.merchantRepository.getMerchantByEmail(email);
             if (!merchant) {
                 this.logger.error(ErrorMessages.MERCHANT_NOT_FOUND);
                 throw new HttpException(httpStatus.NOT_FOUND, ErrorMessages.MERCHANT_NOT_FOUND);
@@ -109,13 +118,13 @@ export class MerchantAuthService implements IAuthService{
                 this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
                 throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_VERIFICATION_TOKEN);
             }
-            await this.merchantRepository.update({ emailVerifiedAt: new Date() }, merchant.id);
+            await this.merchantRepository.update({ emailVerifiedAt: new Date(), emailVerificationCode: null }, merchant.id);
             return true;
         } catch (e) {
             if (e instanceof JsonWebTokenError) {
                 this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
                 throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_VERIFICATION_TOKEN);
-            }else{
+            } else {
                 this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
                 throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
             }
@@ -130,8 +139,8 @@ export class MerchantAuthService implements IAuthService{
             throw new HttpException(httpStatus.NOT_FOUND, ErrorMessages.MERCHANT_NOT_FOUND);
         }
         const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
-        await this.merchantRepository.update({passwordResetCode: resetCode}, merchant.id);
-        this.eventEmiter.emit("sendPasswordResetEmail", { email, resetCode });
+        await this.merchantRepository.update({ passwordResetCode: resetCode }, merchant.id);
+        this.eventEmiter.emit("sendMerchantPasswordResetEmail", { email, resetCode });
         return true;
     }
 
@@ -149,13 +158,14 @@ export class MerchantAuthService implements IAuthService{
                 this.logger.error(ErrorMessages.INVALID_RESET_TOKEN);
                 throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_RESET_TOKEN);
             }
-            await this.merchantRepository.update({ password: newPassword }, merchant.id);
+            const hashedPassword = await this.bcryptService.hashPassword(newPassword);
+            await this.merchantRepository.update({ password: hashedPassword, passwordResetCode: null }, merchant.id);
             return true;
         } catch (e) {
             if (e instanceof JsonWebTokenError) {
                 this.logger.error(ErrorMessages.INVALID_VERIFICATION_TOKEN);
                 throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_VERIFICATION_TOKEN);
-            }else{
+            } else {
                 this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
                 throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
             }
