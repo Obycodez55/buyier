@@ -19,7 +19,6 @@ export interface IMerchant {
     passwordResetCode?: string | null;
     createdAt: Date;
     updatedAt: Date;
-    deletedAt?: Date;
 }
 
 export interface IMerchantCreation extends Optional<IMerchant, "id" | "createdAt" | "updatedAt"> { }
@@ -27,7 +26,6 @@ export interface IMerchantCreation extends Optional<IMerchant, "id" | "createdAt
 
 @Table({
     modelName: "Merchant",
-    paranoid: true,
     timestamps: true,
     version: true,
     indexes: [

@@ -1,4 +1,4 @@
-import { EventEmitter } from "stream";
+import EventEmitter  from "events";
 import { BcryptService } from "../../utils/bcrypt/bcrypt.service";
 import { ILogger } from "../../utils/logger/logger.interface";
 import { IAuthService } from "./auth.service.interface";
@@ -16,6 +16,7 @@ import { cryptoService } from "../../utils/crypto";
 import { JsonWebTokenError } from "jsonwebtoken";
 import { ForgotPasswordRequestDto } from "../../dtos/authDtos/forgotPasswordRequest.dto";
 import { ResetPasswordRequestDto } from "../../dtos/authDtos/resetPasswordRequest.dto";
+import { eventEmmiter } from "../../utils/events";
 
 export class CustomerAuthService implements IAuthService {
     private readonly customerRepository: CustomerRepository;
@@ -28,14 +29,19 @@ export class CustomerAuthService implements IAuthService {
         customerRepository: CustomerRepository,
         logger: ILogger,
         bcryptService: BcryptService,
-        jwtService: JWTService,
-        eventEmmiter: EventEmitter
+        jwtService: JWTService
     ) {
         this.customerRepository = customerRepository;
         this.logger = logger;
         this.bcryptService = bcryptService;
         this.jwtService = jwtService
         this.eventEmiter = eventEmmiter;
+    }
+
+    private getToken(payload: { [key: string]: any }) {
+        const hash = this.jwtService.signPayload(payload, "15m");
+        const token = cryptoService.encrypt(hash);
+        return token;
     }
 
     async login(loginData: LoginRequestDto): Promise<LoginResponseDto> {
@@ -80,7 +86,8 @@ export class CustomerAuthService implements IAuthService {
             // Send email verification code
             const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             await this.customerRepository.update({ emailVerificationCode: verificationCode }, newCustomer.id);
-            this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, verificationCode });
+            const token = this.getToken({ email, verificationCode });
+            this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token });
             return true;
         } catch (e) {
             this.logger.error(`${ErrorMessages.REGISTER_CUSTOMER_FAILED}: ${e}`);
@@ -97,7 +104,8 @@ export class CustomerAuthService implements IAuthService {
         }
         const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
         await this.customerRepository.update({ emailVerificationCode: verificationCode }, customer.id);
-        this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, verificationCode });
+        const token = this.getToken({ email, verificationCode });
+        this.eventEmiter.emit("sendCustomerEmailVerificationEmail", { email, token });
         return true;
     }
 
@@ -123,7 +131,8 @@ export class CustomerAuthService implements IAuthService {
                 throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_VERIFICATION_TOKEN);
             } else {
                 this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
-                throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
+                throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_VERIFICATION_TOKEN);
+                // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
             }
         }
 
@@ -138,7 +147,8 @@ export class CustomerAuthService implements IAuthService {
         }
         const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
         await this.customerRepository.update({ passwordResetCode: resetCode }, customer.id);
-        this.eventEmiter.emit("sendCustomerPasswordResetEmail", { email, resetCode });
+        const token = this.getToken({ email, resetCode });
+        this.eventEmiter.emit("sendCustomerPasswordResetEmail", { email, token });
         return true;
     }
 
@@ -165,7 +175,8 @@ export class CustomerAuthService implements IAuthService {
                 throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_VERIFICATION_TOKEN);
             } else {
                 this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
-                throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
+                throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_VERIFICATION_TOKEN);
+                // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
             }
         }
     }

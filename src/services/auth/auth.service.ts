@@ -63,16 +63,14 @@ export class AuthService implements IAuthService {
                 context.userRepository,
                 this.logger,
                 this.bcryptService,
-                this.jwtService,
-                this.eventEmiter
+                this.jwtService
             );
         } else if (this.isMerchantContext(context)) {
             this.context = new MerchantAuthService(
                 context.userRepository,
                 this.logger,
                 this.bcryptService,
-                this.jwtService,
-                this.eventEmiter
+                this.jwtService
             );
         } else {
             throw new Error("Invalid context provided");
@@ -97,17 +95,10 @@ export class AuthService implements IAuthService {
         return context.context === "Merchant";
     }
 
-    private getToken(payload: { [key: string]: any }) {
-        const hash = this.jwtService.signPayload(payload, "15m");
-        const token = cryptoService.encrypt(hash);
-        return token;
-    }
 
     initializeEventHandlers() {
-        this.eventEmiter.on(`send${this.contextText}PasswordResetEmail`, async (data: { email: string, resetCode: string }) => {
-            const { email, resetCode } = data;
-            const payload = { email, resetCode };
-            const token = this.getToken(payload);
+        this.eventEmiter.on(`send${this.contextText}PasswordResetEmail`, async (data: { email: string, token: string }) => {
+            const { email, token } = data;
             const link = token;
             await this.emailService.sendMail({
                 to: email,
@@ -119,10 +110,8 @@ export class AuthService implements IAuthService {
             })
         });
 
-        this.eventEmiter.on(`send${this.contextText}EmailVerificationEmail`, async (data: { email: string, verificationCode: string }) => {
-            const { email, verificationCode } = data;
-            const payload = { email, verificationCode };
-            const token = this.getToken(payload);
+        this.eventEmiter.on(`send${this.contextText}EmailVerificationEmail`, async (data: { email: string, token: string }) => {
+            const { email, token } = data;
             const link = token;
             await this.emailService.sendMail({
                 to: email,

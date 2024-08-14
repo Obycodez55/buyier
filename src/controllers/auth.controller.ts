@@ -43,7 +43,7 @@ export class AuthController {
         try {
             const result = await this.authService.register(request.body);
             const resObj = new ResponseDto(ResponseStatus.SUCCESS, SuccessMessages.REGISTRATION_SUCCESSFUL, result);
-            response.status(httpStatus.OK).send(resObj);
+            response.status(httpStatus.CREATED).send(resObj);
         } catch (e) {
             next(e);
         }

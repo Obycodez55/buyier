@@ -1,4 +1,4 @@
-import { EventEmitter } from "stream";
+import  EventEmitter  from "events";
 import { BcryptService } from "../../utils/bcrypt/bcrypt.service";
 import { ILogger } from "../../utils/logger/logger.interface";
 import { IAuthService } from "./auth.service.interface";
@@ -12,6 +12,7 @@ import { LoginResponseDto } from "../../dtos/authDtos/loginResponse.dto";
 import { MerchantRepository } from "../../repositories/merchant.repository";
 import { cryptoService } from "../../utils/crypto";
 import { JsonWebTokenError } from "jsonwebtoken";
+import { eventEmmiter } from "../../utils/events";
 
 export class MerchantAuthService implements IAuthService {
     private readonly merchantRepository: MerchantRepository;
@@ -24,8 +25,7 @@ export class MerchantAuthService implements IAuthService {
         merchantRepository: MerchantRepository,
         logger: ILogger,
         bcryptService: BcryptService,
-        jwtService: JWTService,
-        eventEmmiter: EventEmitter
+        jwtService: JWTService
     ) {
         this.merchantRepository = merchantRepository;
         this.logger = logger;
@@ -73,8 +73,8 @@ export class MerchantAuthService implements IAuthService {
         }
         try {
             const hashedPassword = await this.bcryptService.hashPassword(password);
-            const newMerchant = { ...registerData, password: hashedPassword };
-            await this.merchantRepository.save(newMerchant);
+            const newMerchantData = { ...registerData, password: hashedPassword };
+            const newMerchant = await this.merchantRepository.save(newMerchantData);
 
             // Send welcome email
             this.eventEmiter.emit("sendMerchantWelcomeEmail", { email, firstName, lastName });
@@ -83,9 +83,9 @@ export class MerchantAuthService implements IAuthService {
             const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
             await this.merchantRepository.update({ emailVerificationCode: verificationCode }, newMerchant.id);
             this.eventEmiter.emit("sendMerchantEmailVerificationEmail", { email, verificationCode });
-
             return true;
         } catch (e) {
+            console.log(e)
             this.logger.error(`${ErrorMessages.REGISTER_MERCHANT_FAILED}: ${e}`);
             throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.REGISTER_MERCHANT_FAILED);
         }
@@ -126,7 +126,8 @@ export class MerchantAuthService implements IAuthService {
                 throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_VERIFICATION_TOKEN);
             } else {
                 this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
-                throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
+                throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_VERIFICATION_TOKEN);
+                // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
             }
         }
     }
@@ -167,7 +168,8 @@ export class MerchantAuthService implements IAuthService {
                 throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_VERIFICATION_TOKEN);
             } else {
                 this.logger.error(`${ErrorMessages.EMAIL_VERIFICATION_FAILED}: ${e}`);
-                throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
+                throw new HttpException(httpStatus.BAD_REQUEST, ErrorMessages.INVALID_VERIFICATION_TOKEN);
+                // throw new HttpException(httpStatus.INTERNAL_SERVER_ERROR, ErrorMessages.EMAIL_VERIFICATION_FAILED);
             }
         }
     }

@@ -19,14 +19,12 @@ export interface ICustomer{
     passwordResetCode?: string | null;
     createdAt: Date;
     updatedAt: Date;
-    deletedAt?: Date;
 }
 
 export interface ICustomerCreation extends Optional<ICustomer, "id" | "createdAt" | "updatedAt"> {}
 
 @Table({ 
     modelName: "Customer",
-    paranoid: true,
     timestamps: true,
     version: true,
     indexes: [

@@ -21,26 +21,23 @@
     "seed:undo": "sequelize db:seed:undo",
     "seed:undo:all": "sequelize db:seed:undo:all"
   },
-  "jest": {
-    "verbose": false,
-    "testEnvironment": "node",
-    "testMatch": [
-      "**/tests/**/*.test.ts"
-    ],
-    "collectCoverage": true,
-    "coverageDirectory": "coverage",
-    "transform": {
-      "^.+\\.[jt]sx?$": "ts-jest"
-    },
-    "setupFiles": [
-      "dotenv/config"
-    ],
-    "globals": {
-      "ts-jest": {
-        "isolatedModules": true
-      }
-    }
+ "jest": {
+  "verbose": false,
+  "testEnvironment": "node",
+  "testMatch": [
+    "**/tests/**/*.test.ts"
+  ],
+  "collectCoverage": true,
+  "coverageDirectory": "coverage",
+  "transform": {
+    "^.+\\.[jt]sx?$": ["ts-jest", {
+      "isolatedModules": true
+    }]
   },
+  "setupFiles": [
+    "dotenv/config"
+  ]
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Obycodez55/buyier.git"

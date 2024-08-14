@@ -53,7 +53,7 @@ export class NodemailerProvider implements IEmailService {
                         reject(err);
                         return;
                     }
-                    this.logger.info("Email sent successfully", {info: info.envelope, id: info.messageId, accepted: info.accepted, rejected: info.rejected});
+                    this.logger.info("Email sent successfully", {accepted: info.accepted, rejected: info.rejected});
                     resolve();
                 });
             });

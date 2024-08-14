@@ -4,6 +4,8 @@ export enum LoggerPath {
     CustomerAuthService = "logs/customer-auth-service.log",
     MerchantAuthService = "logs/merchant-auth-service.log",
     EmailService = "logs/email-service.log",
+    CustomerAuthServiceTest= "logs/customer-auth-service-test.log",
+    MerchantAuthServiceTest = "logs/merchant-auth-service-test.log",    
 }
 
 export interface LoggerPathIndex {
