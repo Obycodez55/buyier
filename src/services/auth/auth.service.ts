@@ -1,5 +1,4 @@
 import { BcryptService } from "../../utils/bcrypt/bcrypt.service";
-import { cryptoService } from "../../utils/crypto";
 import { EmailService } from "../../utils/email/email.service";
 import { eventEmmiter } from "../../utils/events";
 import { JWTService } from "../../utils/jwt/jwt.service";

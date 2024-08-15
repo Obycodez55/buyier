@@ -12,11 +12,11 @@ import httpStatus from "http-status";
 import { CustomerRegisterRequestDto } from "../../dtos/authDtos/customerRegisterRequest.dto";
 import { EmailVerificationRequestDto } from "../../dtos/authDtos/emailVerificationRequest.dto";
 import { VerifyEmailRequestDto } from "../../dtos/authDtos/verifyEmailRequest.dto";
-import { cryptoService } from "../../utils/crypto";
 import { JsonWebTokenError } from "jsonwebtoken";
 import { ForgotPasswordRequestDto } from "../../dtos/authDtos/forgotPasswordRequest.dto";
 import { ResetPasswordRequestDto } from "../../dtos/authDtos/resetPasswordRequest.dto";
 import { eventEmmiter } from "../../utils/events";
+import { cryptoService } from "../../utils/crypto/crypto.service";
 
 export class CustomerAuthService implements IAuthService {
     private readonly customerRepository: CustomerRepository;

@@ -1,10 +1,12 @@
 import { createCipheriv, createDecipheriv, createHash } from 'crypto';
 import { configService } from '../config/config.service';
+import { CryptoInterface } from './crypto.interface';
 
-export class CryptoService {
+class CryptoService implements CryptoInterface {
     protected static readonly key: Buffer = createHash('sha256').update(String(configService.get<string>('CRYPTO_KEY'))).digest().slice(0, 32);
     protected static readonly iv: Buffer = createHash('sha256').update(String(configService.get<string>('CRYPTO_IV'))).digest().slice(0, 16);
     private readonly encryptionAlgorithm: string = configService.get<string>('CRYPTO_ENCRYPTION_ALGORITHM') as string;
+    private static instance: CryptoService;
 
     encrypt(text: string) {
         const cipher = createCipheriv(this.encryptionAlgorithm, CryptoService.key, CryptoService.iv);
@@ -20,4 +22,13 @@ export class CryptoService {
         decrypted += decipher.final('utf8');
         return decrypted;
     }
+
+    static getInstance(): CryptoService {
+        if (!this.instance) {
+          this.instance = new CryptoService();
+        }
+        return this.instance;
+      }
 }
+
+export const cryptoService = CryptoService.getInstance(); // To return an instance of the CryptoService class

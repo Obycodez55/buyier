@@ -10,9 +10,9 @@ import HttpException from "../../utils/exceptions/http.exception";
 import httpStatus from "http-status";
 import { LoginResponseDto } from "../../dtos/authDtos/loginResponse.dto";
 import { MerchantRepository } from "../../repositories/merchant.repository";
-import { cryptoService } from "../../utils/crypto";
 import { JsonWebTokenError } from "jsonwebtoken";
 import { eventEmmiter } from "../../utils/events";
+import { cryptoService } from "../../utils/crypto/crypto.service";
 
 export class MerchantAuthService implements IAuthService {
     private readonly merchantRepository: MerchantRepository;

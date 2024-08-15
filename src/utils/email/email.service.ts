@@ -13,7 +13,8 @@ export class EmailService implements IEmailService {
     private readonly emailProvider: IEmailService;
 
     constructor() {
-        this.logger = new WinstonLogger("EmailService");
+        const scope = configService.get<string>("NODE_ENV") === "test" ? "EmailServiceTest" : "EmailService";
+        this.logger = new WinstonLogger(scope);
         this.OAuth2Client = new OAuth2Client(
             configService.get<string>("GMAIL_CLIENT_ID"),
             configService.get<string>("GMAIL_CLIENT_SECRET"),
